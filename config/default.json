@@ -1,0 +1,13 @@
+{
+    "MongoDB" :
+    {
+        "Configurations":
+        {
+            "host": "localhost",
+            "user" : "",
+            "password": "",
+            "port": "27017",
+            "database": "foodDB"
+        }
+    }
+}
