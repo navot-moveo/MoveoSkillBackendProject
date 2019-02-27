@@ -3,19 +3,19 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var Chef = new Schema({
+var Icon = new Schema({
     name: {
         type: String,
+        enum:['spicy','vegitarian','vegan'],
         required:'name is required'
     },
-    personalStory: String,
-    image: { data: Buffer, contentType: String }
+    image: String
 });
 
-Chef.set('toJSON', {
+Icon.set('toJSON', {
     transform:function(doc, ret, options){
         return ret;
     }
 });
 
-module.exports = mongoose.model('Chef', Chef);
+module.exports = mongoose.model('Icon', Icon);
