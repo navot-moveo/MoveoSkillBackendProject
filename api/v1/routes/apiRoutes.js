@@ -10,7 +10,8 @@ var chefController = require('../controllers/chefController.js');
 var dishController = require('../controllers/dishController.js');
 
 router.route('/restaurants')
-    .post(restaurantController.addRestaurant);
+    .post(restaurantController.addRestaurant)
+    .get(restaurantController.getRestaurants)
 
 router.route('/chefs')
     .post(chefController.addChef);

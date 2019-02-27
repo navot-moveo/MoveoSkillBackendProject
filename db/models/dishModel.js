@@ -11,10 +11,10 @@ var Dish = new Schema({
     ingredients: [{
         type: String
     }],
-    mealType: {
-        type: String,
-        enum: ['breakfast','lunch','dinner']
-    },
+    mealType: [{
+        type: String
+    }],
+    about: String,
     price: Number,
     icons:[{type: Schema.Types.ObjectId, ref: 'Icon'}],
     imageUrl: String 
