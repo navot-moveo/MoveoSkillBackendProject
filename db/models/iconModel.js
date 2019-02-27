@@ -9,11 +9,13 @@ var Icon = new Schema({
         enum:['spicy','vegitarian','vegan'],
         required:'name is required'
     },
-    image: String
+    imageUrl: String
 });
 
 Icon.set('toJSON', {
     transform:function(doc, ret, options){
+        delete ret._id;
+        delete ret.__v;
         return ret;
     }
 });

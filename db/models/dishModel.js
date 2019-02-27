@@ -17,11 +17,13 @@ var Dish = new Schema({
     },
     price: Number,
     icons:[{type: Schema.Types.ObjectId, ref: 'Icon'}],
-    image: String 
+    imageUrl: String 
 });
 
 Dish.set('toJSON', {
     transform:function(doc, ret, options){
+        delete ret._id;
+        delete ret.__v;
         return ret;
     }
 });
