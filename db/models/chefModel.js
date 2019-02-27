@@ -9,7 +9,7 @@ var Chef = new Schema({
         required:'name is required'
     },
     personalStory: String,
-    image: { data: Buffer, contentType: String }
+    imageUrl: String
 });
 
 Chef.set('toJSON', {

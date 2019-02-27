@@ -1,3 +1,7 @@
+/**
+ * This module routes any URL that starts with: '../api/restaurants/'
+ */
+
 var restaurantHandler = require('../handlers/restaurantHandler.js');
 
 function addRestaurant(req, res, next){
