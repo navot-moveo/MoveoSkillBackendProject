@@ -1,3 +1,5 @@
+'use strict';
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -25,6 +27,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//todo change the routes here to my routes
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
