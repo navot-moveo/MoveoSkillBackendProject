@@ -12,10 +12,9 @@ function addRestaurant(restaurant, callback){
     });
 }
 
-function getRestaurants(restaurant, callback){
-    Restaurant.find()
+function getAllRestaurants(callback){
+    Restaurant.find({},'name chef imageUrl')
     .populate('chef', 'name')
-    .populate('dishes', 'name')
     .exec(function(err, restaurants){
         if(err){
             callback(err);
@@ -25,6 +24,22 @@ function getRestaurants(restaurant, callback){
     });
 }
 
+function getNewRestaurants(callback){
+
+}
+
+function getPopularRestaurants(callback){
+    
+}
+
+function getOpenRestaurants(callback){
+    
+}
+
+function getCuisineRestaurants(cuisine, callback){
+    
+}
+
 
 
 
@@ -32,15 +47,27 @@ function restaurantToJson(restaurant){
     var jsonRestaurant = 
     {
         name: restaurant.name,
-        chef: new mongoose.Types.ObjectId(restaurant.chef),
-        couisine: restaurant.couisine,
+        chef: createObjectId(restaurant.chef),
+        cuisine: restaurant.cuisine,
         openingHours: restaurant.openingHours,
+        openingDate: new Date(restaurant.openingDate),
         address: restaurant.address,
         phone: restaurant.phone,
+        about: restaurant.about,
+        imagesUrl: restaurant.imagesUrl,
         dishes: dishesToObjectIds(restaurant.dishes)
     }
     return jsonRestaurant;   
 }
+
+function createObjectId(id){
+    if(id !== undefined){
+        let objectId = new mongoose.Types.ObjectId(id);
+        return objectId;
+    } 
+}
+
+
 
 function dishesToObjectIds(dishesArray){
     for (let index = 0; index < dishesArray.length; index++) {
@@ -52,6 +79,10 @@ function dishesToObjectIds(dishesArray){
 
 module.exports = {
     addRestaurant,
-    getRestaurants
+    getAllRestaurants,
+    getNewRestaurants,
+    getPopularRestaurants,
+    getOpenRestaurants,
+    getCuisineRestaurants
 };
 

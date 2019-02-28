@@ -10,11 +10,24 @@ var Restaurant = new Schema(
         required:'name is required',
         unique:true
     },
-    chef: {type: Schema.Types.ObjectId, ref: 'Chef'},
-    couisine: String,
+    chef: {
+        type: Schema.Types.ObjectId,
+        ref: 'Chef',
+        required:'chef is required'
+    },
+    cuisine: {
+        type: String,
+        required:'cuisine is required'
+    },
     openingHours:[{nameOfTheDay:String, open: Number, close : Number}],
+    openingDate: {
+        type : Date,
+        required: 'opening date is required'
+    },
     address: String,
     phone: String,
+    about: String,
+    imagesUrl:[{type: String}],
     dishes:[{type: Schema.Types.ObjectId, ref: 'Dish'}]
     },
     {

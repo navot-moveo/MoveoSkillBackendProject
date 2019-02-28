@@ -13,9 +13,49 @@ function addRestaurant(req, res, next){
         }
     });
 };
+function getRestaurantsSortedBy(req, res, next){
+    switch(req.params.sortField){
+        case 'new':
+        restaurantHandler.getNewRestaurants(function(err, restaurant){
+            if(err){
+                next(err);
+            } else{
+                res.send(restaurant);
+            }
+        });
+        break;
+        case 'popular':
+        restaurantHandler.getPopularRestaurants(function(err, restaurant){
+            if(err){
+                next(err);
+            } else{
+                res.send(restaurant);
+            }
+        });
+        break;
+        case 'open':
+        restaurantHandler.getOpenRestaurants(function(err, restaurant){
+            if(err){
+                next(err);
+            } else{
+                res.send(restaurant);
+            }
+        });
+        break;
+        default:
+        restaurantHandler.getAllRestaurants(function(err, restaurant){
+            if(err){
+                next(err);
+            } else{
+                res.send(restaurant);
+            }
+        });
 
-function getRestaurants(req, res, next){
-    restaurantHandler.getRestaurants(req.body.restaurant, function(err, restaurant){
+    }
+}
+
+function getAllRestaurants(req, res, next){
+    restaurantHandler.getRestaurants(function(err, restaurant){
         if(err){
             next(err);
         } else{
@@ -26,6 +66,7 @@ function getRestaurants(req, res, next){
 
 module.exports = {
     addRestaurant,
-    getRestaurants
+    getAllRestaurants,
+    getRestaurantsSortedBy
 };
 

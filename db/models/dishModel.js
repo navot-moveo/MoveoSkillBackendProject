@@ -6,14 +6,15 @@ var Schema = mongoose.Schema;
 var Dish = new Schema({
     name: {
         type: String,
-        required:'name is required'
+        required:'name is required',
+        unique:true
     },
     ingredients: [{
         type: String
     }],
-    mealType: [{
-        type: String
-    }],
+    catagory: [{type: Schema.Types.ObjectId, ref: 'DishCatagory'}],
+    sides:[{type: String}],
+    changes:[{type: String}],
     price: Number,
     icons:[{type: Schema.Types.ObjectId, ref: 'Icon'}],
     imageUrl: String 

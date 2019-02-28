@@ -11,7 +11,9 @@ var dishController = require('../controllers/dishController.js');
 
 router.route('/restaurants')
     .post(restaurantController.addRestaurant)
-    .get(restaurantController.getRestaurants)
+    .get(restaurantController.getRestaurantsSortedBy)
+    .get(restaurantController.getAllRestaurants)
+    
 
 router.route('/chefs')
     .post(chefController.addChef);

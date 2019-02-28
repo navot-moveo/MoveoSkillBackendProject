@@ -6,7 +6,8 @@ var Schema = mongoose.Schema;
 var Chef = new Schema({
     name: {
         type: String,
-        required:'name is required'
+        required:'name is required',
+        unique:true
     },
     personalStory: String,
     imageUrl: String
