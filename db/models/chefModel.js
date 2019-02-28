@@ -11,6 +11,10 @@ var Chef = new Schema({
     },
     personalStory: String,
     imageUrl: String
+},
+{
+    versionKey: false,
+    timestamps: true
 });
 
 Chef.set('toJSON', {

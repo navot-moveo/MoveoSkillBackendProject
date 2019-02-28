@@ -10,7 +10,12 @@ var Icon = new Schema({
         required:'name is required'
     },
     imageUrl: String
-});
+    },
+    {
+        versionKey: false,
+        timestamps: true
+    }
+);
 
 Icon.set('toJSON', {
     transform:function(doc, ret, options){
