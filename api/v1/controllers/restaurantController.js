@@ -1,7 +1,7 @@
 /**
  * This module routes any URL that starts with: '../api/restaurants/'
  */
-
+'use strict';
 var restaurantHandler = require('../handlers/restaurantHandler.js');
 
 function addRestaurant(req, res, next){
@@ -12,46 +12,16 @@ function addRestaurant(req, res, next){
             res.send(restaurant);
         }
     });
-};
-function getRestaurantsSortedBy(req, res, next){
-    switch(req.params.sortField){
-        case 'new':
-        restaurantHandler.getNewRestaurants(function(err, restaurant){
-            if(err){
-                next(err);
-            } else{
-                res.send(restaurant);
-            }
-        });
-        break;
-        case 'popular':
-        restaurantHandler.getPopularRestaurants(function(err, restaurant){
-            if(err){
-                next(err);
-            } else{
-                res.send(restaurant);
-            }
-        });
-        break;
-        case 'open':
-        restaurantHandler.getOpenRestaurants(function(err, restaurant){
-            if(err){
-                next(err);
-            } else{
-                res.send(restaurant);
-            }
-        });
-        break;
-        default:
-        restaurantHandler.getAllRestaurants(function(err, restaurant){
-            if(err){
-                next(err);
-            } else{
-                res.send(restaurant);
-            }
-        });
+}
 
-    }
+function getRestaurantsSortedBy(req, res, next){
+    restaurantHandler.getAllRestaurantsSortedBy(req.query.sortField, req.query.param, function(err, restaurant){
+        if(err){
+            next(err);
+        } else{
+            res.send(restaurant);
+        }
+    });
 }
 
 function getAllRestaurants(req, res, next){

@@ -8,12 +8,12 @@ var router = express.Router();
 var restaurantController = require('../controllers/restaurantController.js');
 var chefController = require('../controllers/chefController.js');
 var dishController = require('../controllers/dishController.js');
+var restaurantValidator = require('../validators/restaurantValidator.js');
 
 router.route('/restaurants')
-    .post(restaurantController.addRestaurant)
+    .post(restaurantValidator.validateCreateRestaurant,restaurantController.addRestaurant)
     .get(restaurantController.getRestaurantsSortedBy)
-    .get(restaurantController.getAllRestaurants)
-    
+ 
 
 router.route('/chefs')
     .post(chefController.addChef);
