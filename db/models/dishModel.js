@@ -14,7 +14,6 @@ var Dish = new Schema({
     mealType: [{
         type: String
     }],
-    about: String,
     price: Number,
     icons:[{type: Schema.Types.ObjectId, ref: 'Icon'}],
     imageUrl: String 
