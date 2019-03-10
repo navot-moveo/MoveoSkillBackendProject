@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 var moment = require('moment');
 var Restaurant = require('../../../db/models/restaurantModel.js');
 var restaurantUtil = require('../../../utils/restaurantUtil.js');
+var DishCatagory = require('../../../db/models/dishCatagoryModel.js');
 
 function addRestaurant(restaurant, callback){
     var newRestaurant = new Restaurant(restaurantToJson(restaurant));
@@ -96,6 +97,21 @@ function getAllSpecificCuisineRestaurants(typeOfCuisine, callback){
     });
 }
 
+//this method gives all the restaurant of a specific chef by id
+function getAllSpecificChefRestaurants(chefId, callback){
+    console.log('');
+    Restaurant.aggregate([
+        { $match: { chef: mongoose.Types.ObjectId(chefId) } },
+        { $project : { _id: 0 , imagesUrl : 1, name:1 }} 
+    ], function (err, restaurants) {
+        if (err) {
+            callback(err);
+        } else{
+            callback(null, restaurants);
+        }        
+    });
+}
+
 //this method decide how to sort the restaurants 
 function getAllRestaurantsSortedBy(sortField, param, callback){
     switch(sortField){
@@ -110,6 +126,9 @@ function getAllRestaurantsSortedBy(sortField, param, callback){
         break;
         case 'cuisine':
         getAllSpecificCuisineRestaurants(param, callback);
+        break;
+        case 'chef':
+        getAllSpecificChefRestaurants(param, callback);
         break;
         default:
         getAllRestaurants(callback);
@@ -193,12 +212,28 @@ function getRestaurantActionById(id, action, callback){
         case 'profile':
         getRestaurantProfileById(id, callback);
         break;
+        case 'menu':
+        getRestaurantMenu(id, callback);
+        break;
         default:
         getRestaurantById(id, callback);
         break;
     }
 }
 
+function getRestaurantMenu(restaurantId, callback){
+    var query = {};
+    query['restaurant_id'] = restaurantId;
+    DishCatagory.find(query, 'name',function(err, menu){
+        if(err){
+            callback(err);
+        } else{
+            callback(null, menu);
+        }
+    })
+}
+
+//this method returns all the cuisines in the app
 function getAllRestaurantsCuisine(callback){
     Restaurant.find().distinct('cuisine',function(err, restaurants){
         if(err){
@@ -208,6 +243,20 @@ function getAllRestaurantsCuisine(callback){
         }
     })
 };
+
+function searchRestaurant(q, searchField, callback){
+    var regex = new RegExp('^' + q +'| ' + q);
+    const query = {}
+    query[`${searchField}`] = {$regex: regex, $options:'i'};
+    //{searchField: {$regex: regex, $options:'m'}}
+    Restaurant.find(query, function(err, restaurants){
+        if(err){
+            callback(err);
+        } else{
+            callback(null, restaurants);
+        } 
+    })
+}
 
 ///---------------helper methods------------///
 function convertNumToDay(num){
@@ -280,6 +329,7 @@ module.exports = {
     getAllRestaurantsSortedBy,
     getAllSpecificCuisineRestaurants,
     getRestaurantActionById,
-    getAllRestaurantsCuisine
+    getAllRestaurantsCuisine,
+    searchRestaurant
 };
 

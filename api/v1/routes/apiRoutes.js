@@ -19,6 +19,9 @@ router.route('/restaurants')
 router.route('/restaurants/allCuisines')
     .get(restaurantController.getAllRestaurantsCuisine)
 
+router.route('/restaurants/search')
+    .get(restaurantController.searchRestaurant)
+
 router.route('/restaurants/:id')
     .get(restaurantController.getRestaurantActionById)
 

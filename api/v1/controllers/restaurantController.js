@@ -64,12 +64,25 @@ function getAllRestaurantsCuisine(req,res,next){
     }); 
 }
 
+function searchRestaurant(req,res,next){
+    var query = req.query.q;
+    restaurantHandler.searchRestaurant(query, req.query.searchField, function(err, restaurant){
+        if(err){
+            next(err);
+        } else{
+            res.send(restaurant);
+        }
+    }); 
+}
+
+
 
 module.exports = {
     addRestaurant,
     getAllRestaurants,
     getRestaurantsSortedBy,
     getRestaurantActionById,
-    getAllRestaurantsCuisine
+    getAllRestaurantsCuisine,
+    searchRestaurant
 };
 

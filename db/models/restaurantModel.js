@@ -66,6 +66,10 @@ var Restaurant = new Schema(
     }
 );
 
+Restaurant.index({name: "text", chef:"text", cuisine:"text"});
+
+
+
 Restaurant.set('toJSON', {
     transform:function(doc, ret, options){
         delete ret._id;
