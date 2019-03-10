@@ -11,6 +11,22 @@ function addDish(dish, callback){
         }
     });
 }
+//this method gives information before ordering a specific dish 
+function getDishById(dishId, callback){
+    var query = {};
+    query['_id'] = dishId;
+    Dish.findOne(query, '-catagory')
+    .populate({
+        path: 'icons'
+    })
+    .exec(function(err, dish){
+        if(err){
+            callback(err);
+        } else{
+            callback(null, dish);
+        }
+    });
+}
 
 function dishToJson(dish){
     var jsonDish = 
@@ -46,5 +62,6 @@ function createObjectId(id){
 
 
 module.exports = {
-    addDish
+    addDish,
+    getDishById
 };

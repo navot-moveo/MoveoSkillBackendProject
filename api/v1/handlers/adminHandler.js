@@ -55,10 +55,33 @@ function addObjectFilter(objectType, object, callback){
     }
 }
 
+function getObjectFilter(objectType, callback){
+    switch(objectType){
+        case 'icon':
+        getIcons(callback);
+        break;
+        case 'dishCatagory':
+        //getDishCatagories(callback);
+        break;
+        default:
+        break;
+    }
+}
+
+function getIcons(callback){
+    Icon.find({},function(err, icons){
+        if(err){
+            callback(err);
+        } else{
+            callback(null, icons);
+        }
+    });
+}
 
 
 
 module.exports = {
     addIcon,
-    addObjectFilter
+    addObjectFilter,
+    getObjectFilter
 };

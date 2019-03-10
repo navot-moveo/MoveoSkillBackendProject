@@ -12,6 +12,18 @@ function addChef(chef, callback){
     });
 }
 
+function getChegById(chefId, callback){
+    var query = {};
+    query['_id'] = chefId;
+    Chef.findOne(query, function(err, chef){
+        if(err){
+            callback(err);
+        } else{
+            callback(null, chef);
+        }
+    });
+}
+
 function chefToJson(chef){
     var jsonChef = 
     {
@@ -27,5 +39,6 @@ function chefToJson(chef){
 
 
 module.exports = {
-    addChef
+    addChef,
+    getChegById
 };

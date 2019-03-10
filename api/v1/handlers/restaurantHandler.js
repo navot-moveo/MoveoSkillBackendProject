@@ -2,6 +2,7 @@
 var mongoose = require('mongoose');
 var moment = require('moment');
 var Restaurant = require('../../../db/models/restaurantModel.js');
+var restaurantUtil = require('../../../utils/restaurantUtil.js');
 
 function addRestaurant(restaurant, callback){
     var newRestaurant = new Restaurant(restaurantToJson(restaurant));
@@ -116,6 +117,99 @@ function getAllRestaurantsSortedBy(sortField, param, callback){
     }
 }
 
+//this method returns the restaurant dishes sorted by catagory
+function getRestaurantProfileById(restaurantId, callback){
+    var query = {};
+    query['_id'] = restaurantId;
+    Restaurant.findOne(query,'dishes name imagesUrl chef')
+    .populate([{
+        path: 'dishes',
+        select:'-sides -changes',
+        populate:[{
+            path:'icons',
+            select:'name imageUrl'
+        },{
+            path:'catagory',
+            select:'name'
+        }]
+    },
+    {
+        path:'chef',
+        select:'name'
+    }])
+    .exec(function(err, restaurant){
+        var dishesArray = restaurant.dishes;
+        dishesArray.sort(restaurantUtil.predicateBy("catagory"));
+        restaurant.dishes = dishesArray;
+        if(err){
+            callback(err);
+        } else{
+            callback(null, restaurant);
+        }
+    });
+}
+
+//get the opening hours and about of a specific restaurant
+function getRestaurantInfoById(restaurantId, callback){
+    var query = {};
+    query['_id'] = restaurantId;
+    Restaurant.findOne(query,'openingHours about', function(err, restaurant){
+        if(err){
+            callback(err);
+        } else{
+            callback(null, restaurant);
+        }
+    })
+}
+
+//this method returns all the info about a restaurant
+function getRestaurantById(restaurantId, callback){
+    var query = {};
+    query['_id'] = restaurantId;
+    Restaurant.findOne(query)
+    .populate({
+        path: 'dishes',
+        populate:[{
+            path:'icons'
+        },
+        {
+            path:'catagory'
+        }]
+    })
+    .exec(function(err, restaurant){
+        if(err){
+            callback(err);
+        } else{
+            callback(null, restaurant);
+        }
+    });
+}
+//this method select the action to do on a specific restaurant
+function getRestaurantActionById(id, action, callback){
+    switch(action){
+        case 'info':
+        getRestaurantInfoById(id, callback);
+        break;
+        case 'profile':
+        getRestaurantProfileById(id, callback);
+        break;
+        default:
+        getRestaurantById(id, callback);
+        break;
+    }
+}
+
+function getAllRestaurantsCuisine(callback){
+    Restaurant.find().distinct('cuisine',function(err, restaurants){
+        if(err){
+            callback(err);
+        } else{
+            callback(null, restaurants);
+        }
+    })
+};
+
+///---------------helper methods------------///
 function convertNumToDay(num){
     var day = "";
     switch(num){
@@ -143,7 +237,6 @@ function convertNumToDay(num){
     }
     return day;
 }
-
 
 //this method responsible to convert the data we get to a json that go into the db
 function restaurantToJson(restaurant){
@@ -185,6 +278,8 @@ module.exports = {
     addRestaurant,
     getAllRestaurants,
     getAllRestaurantsSortedBy,
-    getAllSpecificCuisineRestaurants
+    getAllSpecificCuisineRestaurants,
+    getRestaurantActionById,
+    getAllRestaurantsCuisine
 };
 
