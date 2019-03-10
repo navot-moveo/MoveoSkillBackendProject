@@ -14,6 +14,21 @@ function addIcon(req, res, next){
     });
 }
 
+
+
+function addObjectFilter(req, res, next){
+    adminHandler.addObjectFilter(req.query.objectType, req.body.object, function(err, object){
+        if(err){
+            next(err);
+        } else{
+            res.send(object);
+        }
+    });
+}
+
+
+
 module.exports = {
-    addIcon
+    addIcon,
+    addObjectFilter
 };

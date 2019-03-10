@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Icon = require('../../../db/models/iconModel.js');
+var DishCatagory = require('../../../db/models/dishCatagoryModel.js');
 
 function addIcon(icon, callback){
     var newIcon = new Icon(iconToJson(icon));
@@ -12,6 +13,26 @@ function addIcon(icon, callback){
     });
 }
 
+function addDishCatagory(dishCatagory, callback){
+    var newDishCatagory= new DishCatagory(dishCatagoryToJson(dishCatagory));
+    newDishCatagory.save(function(err, dishCatagory){
+        if (err){
+            callback(err);
+        } else {
+            callback(null, dishCatagory);
+        }
+    });
+}
+
+function dishCatagoryToJson(dishCatagory){
+    var jsonDishCatagory = 
+    {
+        name: dishCatagory.name,
+        restaurant_id: dishCatagory.restaurantId
+    }
+    return jsonDishCatagory;  
+}
+
 function iconToJson(icon){
     var jsonIcon = 
     {
@@ -21,10 +42,23 @@ function iconToJson(icon){
     return jsonIcon;   
 };
 
+function addObjectFilter(objectType, object, callback){
+    switch(objectType){
+        case 'icon':
+        addIcon(object, callback);
+        break;
+        case 'dishCatagory':
+        addDishCatagory(object, callback);
+        break;
+        default:
+        break;
+    }
+}
 
 
 
 
 module.exports = {
-    addIcon
+    addIcon,
+    addObjectFilter
 };

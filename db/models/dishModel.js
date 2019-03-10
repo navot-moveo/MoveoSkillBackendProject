@@ -3,12 +3,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var DishCatagoryScheme = new Schema({
-    name: String,
-    restaurant_id: {type: Schema.Types.ObjectId, ref: 'Restaurant'}
-});
-var DishCatagory = mongoose.model('DishCatagory', DishCatagoryScheme);
-
 
 var Dish = new Schema({
     name: {

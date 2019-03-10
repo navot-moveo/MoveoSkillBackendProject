@@ -23,7 +23,7 @@ router.route('/dishes')
     .post(dishController.addDish);
 
 router.route('/admin')
-    .post(adminController.addIcon)
+    .post(adminController.addObjectFilter)
 
 
 module.exports = router;
