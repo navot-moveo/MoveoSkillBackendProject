@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Icon = require('../../../db/models/iconModel.js');
 var DishCatagory = require('../../../db/models/dishCatagoryModel.js');
+var User = require('../../../db/models/userModel.js');
 
 function addIcon(icon, callback){
     var newIcon = new Icon(iconToJson(icon));
@@ -60,6 +61,9 @@ function getObjectFilter(objectType, callback){
         case 'icon':
         getIcons(callback);
         break;
+        case 'user':
+        getUsers(callback);
+        break;
         case 'dishCatagory':
         //getDishCatagories(callback);
         break;
@@ -74,6 +78,16 @@ function getIcons(callback){
             callback(err);
         } else{
             callback(null, icons);
+        }
+    });
+}
+
+function getUsers(callback){
+    User.find({},function(err, users){
+        if(err){
+            callback(err);
+        } else{
+            callback(null, users);
         }
     });
 }

@@ -3,13 +3,19 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 const constantSalt = 10;
+const validator = require('validator')
 var Schema = mongoose.Schema;
 
 var User = new Schema({
     full_name: {
         type: String,
-        required:'name is required',
-        unique:true
+        required:'name is required'
+    },
+    email:{
+        type: String,
+        validate: [ validator.isEmail, 'invalid email' ],
+        unique:true,
+        required:'email is required'
     },
     address:{
         type: String,
@@ -25,7 +31,8 @@ var User = new Schema({
     },
     token:{
         type:String
-    }
+    }, 
+    shopping_bag: [{type: Schema.Types.ObjectId, ref: 'Meal'}]
 },
     {
         versionKey: false,

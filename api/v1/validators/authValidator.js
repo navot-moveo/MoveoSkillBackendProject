@@ -19,7 +19,6 @@ function extractToken(req, res, next){
     }
 }
 
-
 module.exports = {
     extractToken
 }

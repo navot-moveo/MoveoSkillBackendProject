@@ -39,8 +39,14 @@ router.route('/dishes/:id')
     .get(dishController.getDishById);
 
 router.route('/users')
-    .get(userController.getUsers)
-    .put(authValidator.extractToken, userController.verifyAndUpdateUser);
+    .get(authValidator.extractToken, userController.verifyToken,userController.getUserShoppingBag)
+    .put(authValidator.extractToken, userController.verifyAndUpdateUser)
+    .post(authValidator.extractToken, userController.verifyToken, userController.addMeal,
+         userController.updateShoppingBag);
+
+//user contact details
+router.route('/users/:id')
+    .get(userController.getUserDetailsById);
 
 //sign up a new user
 router.route('/users/signup')
