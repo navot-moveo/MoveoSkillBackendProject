@@ -9,6 +9,7 @@ var restaurantController = require('../controllers/restaurantController.js');
 var chefController = require('../controllers/chefController.js');
 var adminController = require('../controllers/adminController.js');
 var dishController = require('../controllers/dishController.js');
+var userController = require('../controllers/userController.js');
 var restaurantValidator = require('../validators/restaurantValidator.js');
 
 
@@ -36,6 +37,10 @@ router.route('/dishes')
 
 router.route('/dishes/:id')
     .get(dishController.getDishById);
+
+router.route('/users')
+    .post(userController.addUser)
+    .get(userController.getUsers);
 
 router.route('/admin')
     .post(adminController.addObjectFilter)
