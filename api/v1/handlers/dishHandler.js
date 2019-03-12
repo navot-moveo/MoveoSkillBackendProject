@@ -1,12 +1,29 @@
 var mongoose = require('mongoose');
 var Dish = require('../../../db/models/dishModel.js');
 
+
 function addDish(dish, callback){
     var newDish = new Dish(dishToJson(dish));
     newDish.save(function(err, dish){
         if (err){
             callback(err);
         } else {
+            callback(null, dish);
+        }
+    });
+}
+//this method gives information before ordering a specific dish 
+function getDishById(dishId, callback){
+    var query = {};
+    query['_id'] = dishId;
+    Dish.findOne(query, '-catagory')
+    .populate({
+        path: 'icons'
+    })
+    .exec(function(err, dish){
+        if(err){
+            callback(err);
+        } else{
             callback(null, dish);
         }
     });
@@ -46,5 +63,6 @@ function createObjectId(id){
 
 
 module.exports = {
-    addDish
+    addDish,
+    getDishById
 };

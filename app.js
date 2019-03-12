@@ -40,7 +40,11 @@ app.use(function(req, res, next) {
 // error handler
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
-  res.send(err);
+  if(err.message === undefined){
+    res.send(err);
+  } else{
+    res.send(err.message);
+  }
 });
 
 module.exports = app;

@@ -5,15 +5,35 @@
 var dishHandler = require('../handlers/dishHandler.js');
 
 function addDish(req, res, next){
-    dishHandler.addDish(req.body.dish, function(err, dish){
-        if(err){
-            next(err);
-        } else{
-            res.send(dish);
-        }
-    });
+    if(req.body.dish !== undefined){
+        dishHandler.addDish(req.body.dish, function(err, dish){
+            if(err){
+                next(err);
+            } else{
+                res.send(dish);
+            }
+        });
+    } else{
+        next(new Error("dish field is undefined"));
+    }
+
+}
+
+function getDishById(req, res, next){
+    if(req.params.id !== undefined){
+        dishHandler.getDishById(req.params.id, function(err, dish){
+            if(err){
+                next(err);
+            }else {
+                res.send(dish);
+            }
+        });
+    } else{
+        next(new Error("id field is undefined"));
+    }
 }
 
 module.exports = {
-    addDish
+    addDish,
+    getDishById
 };

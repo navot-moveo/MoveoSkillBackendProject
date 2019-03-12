@@ -3,37 +3,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-const OpeningHoursSchema = new Schema({
-        sunday: {
-            open: Number,
-            close: Number
-        },
-        monday: {
-            open: Number,
-            close: Number
-        },
-        tuesday: {
-            open: Number,
-            close: Number
-        },
-        wednesday: {
-            open: Number,
-            close: Number
-        },
-        thursday: {
-            open: Number,
-            close: Number
-        },
-        friday: {
-            open: Number,
-            close: Number
-        },
-        saturday: {
-            open: Number,
-            close: Number
-        }
-}) ;
-
 var Restaurant = new Schema(
     {
     name: {
@@ -50,8 +19,7 @@ var Restaurant = new Schema(
         type: String,
         required:'cuisine is required'
     },
-    openingHours:{ type : OpeningHoursSchema },
-        /*
+    openingHours:{ 
         sunday: {
             open: Number,
             close: Number
@@ -80,8 +48,7 @@ var Restaurant = new Schema(
             open: Number,
             close: Number
         }
-        */
-    //},
+    },
     openingDate: {
         type : Date,
         required: 'opening date is required'
@@ -94,14 +61,19 @@ var Restaurant = new Schema(
     dishes:[{type: Schema.Types.ObjectId, ref: 'Dish'}]
     },
     {
-        timestamps: true
+        timestamps: true,
+        versionKey: false
     }
 );
+
+
 
 Restaurant.set('toJSON', {
     transform:function(doc, ret, options){
         delete ret._id;
         delete ret.__v;
+        delete ret.createdAt;
+        delete ret.updatedAt;
         return ret;
     }
 });
