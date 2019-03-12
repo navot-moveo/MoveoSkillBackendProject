@@ -22,6 +22,52 @@ function getUsers(callback){
     });
 }
 
+function findUser(uniqueField, valueOfField, callback){
+    var query = {};
+    query[`${uniqueField}`] = valueOfField;
+    User.findOne(query, function(err, user){
+        if(err){
+            callback(err);
+        } else{
+            callback(null, user);
+        }
+    });
+}
+
+//for now user can only change the username
+function updateUserData(userDataToUpdate, uniqueField, uniqueFieldValue, cb){
+    if(userDataToUpdate === undefined){
+        cb(new Error("Couldn't update user."));
+    } else{
+        var query = {};
+        query[`${uniqueField}`] = uniqueFieldValue;
+        User.findOne(query, function(err, user){
+          if(err) {
+                cb(new Error("Couldn't find user in data base."));
+            } else {
+              user = updateUser(user, userDataToUpdate);
+              User.findOneAndUpdate(query, {$set:user}, {new: true}, function (err, user) {
+                if(err) {
+                    cb(new Error("Couldn't save user to data base."));
+                  } else {
+                    cb(null,user);
+                }
+              });
+            }
+        });
+      }
+  }
+///--------------------helper methods--------------------///
+function updateUser(user, update){
+    var updateJson = userToJson(update);
+    var userJson = userToJson(user);
+    for (var key in update) {
+        if (userJson.hasOwnProperty(key)) {
+            userJson[`${key}`] = updateJson[`${key}`];
+        }
+    }
+    return userJson;
+}
 
 function userToJson(user){
     var jsonUser = 
@@ -37,5 +83,7 @@ function userToJson(user){
 
 module.exports = {
     addUser,
-    getUsers
+    getUsers,
+    findUser,
+    updateUserData
 };

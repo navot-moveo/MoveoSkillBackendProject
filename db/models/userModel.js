@@ -1,12 +1,15 @@
 'use strict';
 
 var mongoose = require('mongoose');
+var bcrypt = require('bcrypt');
+const constantSalt = 10;
 var Schema = mongoose.Schema;
 
 var User = new Schema({
     full_name: {
         type: String,
-        required:'name is required'
+        required:'name is required',
+        unique:true
     },
     address:{
         type: String,
@@ -19,6 +22,9 @@ var User = new Schema({
     password:{
         type: String,
         required:'password is required' 
+    },
+    token:{
+        type:String
     }
 },
     {
@@ -26,6 +32,22 @@ var User = new Schema({
         timestamps: true
     }
 );
+
+User.pre('save', function(next){
+    var user = this;
+    //checks if this is our first save or update,make sure that we hash the password only in the first time
+    if(user.isNew) {
+        bcrypt.hash(user.password, constantSalt, function(err, hash){
+            if(err){
+                return next(err);
+            } 
+            user.password = hash;
+            next();
+        });
+    } else {
+        next();
+    }
+});
 
 User.set('toJSON', {
     transform:function(doc, ret, options){

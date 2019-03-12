@@ -11,20 +11,20 @@ var adminController = require('../controllers/adminController.js');
 var dishController = require('../controllers/dishController.js');
 var userController = require('../controllers/userController.js');
 var restaurantValidator = require('../validators/restaurantValidator.js');
-
+var authValidator = require('../validators/authValidator.js');
 
 router.route('/restaurants')
     .post(restaurantValidator.validateCreateRestaurant,restaurantController.addRestaurant)
-    .get(restaurantController.getRestaurantsSortedBy)
+    .get(restaurantController.getRestaurantsSortedBy);
 
 router.route('/restaurants/allCuisines')
-    .get(restaurantController.getAllRestaurantsCuisine)
+    .get(restaurantController.getAllRestaurantsCuisine);
 
 router.route('/restaurants/search')
-    .get(restaurantController.searchRestaurant)
+    .get(restaurantController.searchRestaurant);
 
 router.route('/restaurants/:id')
-    .get(restaurantController.getRestaurantActionById)
+    .get(restaurantController.getRestaurantActionById);
 
 router.route('/chefs')
     .post(chefController.addChef);
@@ -39,8 +39,17 @@ router.route('/dishes/:id')
     .get(dishController.getDishById);
 
 router.route('/users')
-    .post(userController.addUser)
-    .get(userController.getUsers);
+    .get(userController.getUsers)
+    .put(authValidator.extractToken, userController.verifyAndUpdateUser);
+
+//sign up a new user
+router.route('/users/signup')
+    .post(userController.addUser, userController.signUser);
+
+//user allready in the db
+router.route('/users/login')
+    .post(userController.authenticate, userController.signUser);
+
 
 router.route('/admin')
     .post(adminController.addObjectFilter)
