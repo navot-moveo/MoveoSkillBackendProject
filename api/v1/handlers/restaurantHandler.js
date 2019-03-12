@@ -5,6 +5,7 @@ var Restaurant = require('../../../db/models/restaurantModel.js');
 var restaurantUtil = require('../../../utils/restaurantUtil.js');
 var DishCatagory = require('../../../db/models/dishCatagoryModel.js');
 
+//this method add restaurant to the db
 function addRestaurant(restaurant, callback){
     var newRestaurant = new Restaurant(restaurantToJson(restaurant));
     newRestaurant.save(function(err, restaurant){
@@ -15,7 +16,7 @@ function addRestaurant(restaurant, callback){
         }
     });
 }
-
+//this method get all the restaurant from the db
 function getAllRestaurants(callback){
     Restaurant.find({},'name chef imagesUrl')
     .populate('chef', 'name')
@@ -25,7 +26,7 @@ function getAllRestaurants(callback){
         } else{
             callback(null, restaurants);
         }
-    });
+    })   
 }
 
 //now this method decided that new restaurant is 14 days from today
@@ -221,6 +222,7 @@ function getRestaurantActionById(id, action, callback){
     }
 }
 
+//this method returns all the dishCatagories of a restaurand by id
 function getRestaurantMenu(restaurantId, callback){
     var query = {};
     query['restaurant_id'] = restaurantId;
@@ -244,18 +246,39 @@ function getAllRestaurantsCuisine(callback){
     })
 };
 
+//this method is searching by restaurant, chef, cuisine
 function searchRestaurant(q, searchField, callback){
+    //this regex is support partial search of each word in the field
     var regex = new RegExp('^' + q +'| ' + q);
-    const query = {}
+    const query = {};
+    //convert the search field to the correct json field in the model
+    searchField = convertSearchFieldToJsonField(searchField)
+    //updatind the query field
     query[`${searchField}`] = {$regex: regex, $options:'i'};
-    //{searchField: {$regex: regex, $options:'m'}}
-    Restaurant.find(query, function(err, restaurants){
-        if(err){
-            callback(err);
-        } else{
-            callback(null, restaurants);
-        } 
-    })
+    Restaurant.aggregate([
+        {
+            "$lookup": {
+                "from": "chefs", //collection name
+                let: { chef_id: "$chef" },//the value from restaurants collection
+                pipeline: [
+                    //$$ refers to let variabels, $ refers to chefs collection variables
+                    { $match: { $expr:{ $eq: [ "$_id",  "$$chef_id" ] } } },
+                    { $project: { name: 1, _id: 0 } }
+                ],
+                "as": "chef"
+                }
+        },
+        {$unwind: '$chef'},
+        { $match: query },
+        { $project : { _id: 0 , imagesUrl : 1, name:1, chef:1, cuisine:1 }}
+    ],
+        function(err, restaurants){
+            if(err){
+                callback(err);
+            } else{
+                callback(null, restaurants)
+            }
+        })
 }
 
 ///---------------helper methods------------///
@@ -287,6 +310,18 @@ function convertNumToDay(num){
     return day;
 }
 
+//this method convert the search field to the the correct json field
+function convertSearchFieldToJsonField(searchField){
+    searchField = searchField.toLowerCase();
+    if(searchField === 'chef'){
+        searchField = 'chef.name';
+    } else if(searchField === 'restaurant'){
+        searchField = 'name';
+    } else if(searchField === 'cuisine'){
+        searchField = 'cuisine';
+    }
+    return searchField;
+}
 //this method responsible to convert the data we get to a json that go into the db
 function restaurantToJson(restaurant){
     var jsonRestaurant = 
