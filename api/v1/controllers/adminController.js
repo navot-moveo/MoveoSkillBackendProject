@@ -44,8 +44,23 @@ function getObjectFilter(req, res, next){
     }
 }
 
+function getOrdersOfUserByUserId(req, res, next){
+    if(req.query.userId !== undefined){
+        adminHandler.getOrdersOfUserByUserId(req.query.userId, function(err, orders){
+            if(err){
+                next(err);
+            } else{
+                res.send(orders);
+            }
+        });
+    }else {
+        next(new Error("user id is undefined"));
+    }
+}
+
 module.exports = {
     addIcon,
     addObjectFilter,
-    getObjectFilter
+    getObjectFilter,
+    getOrdersOfUserByUserId
 };

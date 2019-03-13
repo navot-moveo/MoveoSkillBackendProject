@@ -1,7 +1,6 @@
 /**
  * This module routes any URL that starts with: '../api/'
  */
-
 'use strict';
 var express = require('express');
 var router = express.Router();
@@ -74,5 +73,7 @@ router.route('/admin')
     .post(adminController.addObjectFilter)
     .get(adminController.getObjectFilter);
 
-
+router.route('/admin/orders')
+    .get(adminController.getOrdersOfUserByUserId);
+    
 module.exports = router;

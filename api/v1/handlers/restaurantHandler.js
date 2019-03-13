@@ -216,6 +216,9 @@ function getRestaurantActionById(id, action, callback){
         case 'menu':
         getRestaurantMenu(id, callback);
         break;
+        case 'open':
+        isRestaurantOpen(id, callback);
+        break;
         default:
         getRestaurantById(id, callback);
         break;
@@ -231,6 +234,21 @@ function getRestaurantMenu(restaurantId, callback){
             callback(err);
         } else{
             callback(null, menu);
+        }
+    })
+}
+
+//this method returns all the dishCatagories of a restaurand by id
+function isRestaurantOpen(restaurantId, callback){
+    var query = {};
+    var today = convertNumToDay(moment(new Date()).day());  
+    query['_id'] = restaurantId;
+    Restaurant.findOne(query, function(err, restaurant){
+        if(err){
+            callback(err);
+        } else{
+            var openingHoursOfToday = restaurant.toObject().openingHours[`${today}`];
+            callback(null, {isOpen: checkIfRestaurantOpen(openingHoursOfToday)});
         }
     })
 }
@@ -310,6 +328,24 @@ function convertNumToDay(num){
     return day;
 }
 
+//this method checks is the restaurant is open right now
+//if yes return json with value true, else return json with value false
+function checkIfRestaurantOpen(openingHoursOfToday) {
+    //var hour = moment(new Date()).hour();
+    var hour = 9;
+    if((12 <= openingHoursOfToday.open  && openingHoursOfToday.close <= 12)){
+        openingHoursOfToday.close += 24;
+        if(0 <= hour && hour < 12) {
+            hour += 24;
+        }
+    }
+    if(openingHoursOfToday.open <= hour && hour <= openingHoursOfToday.close){
+        return true;
+    } else {
+        return false;
+    }
+}
+
 //this method convert the search field to the the correct json field
 function convertSearchFieldToJsonField(searchField){
     searchField = searchField.toLowerCase();
@@ -356,7 +392,6 @@ function dishesToObjectIds(dishesArray){
     }
     return dishesArray;
 }
-
 
 module.exports = {
     addRestaurant,

@@ -157,6 +157,7 @@ function updateShoppingBag(mealToAdd,mealObjectId, callback){
                     if(err) {
                         callback(new Error("Couldn't update user shopping bag to the data base."));
                     } else {
+                        user.total_price = sumShoppingBag(user.shopping_bag);
                         callback(null,user);
                     }
                 });
@@ -197,7 +198,8 @@ function sumShoppingBag(shoppingBag){
     var shoppingBagJson = shoppingBag.shopping_bag;
     var sum = 0;
     for (var i = 0; i < shoppingBagJson.length; i++) {
-        sum += shoppingBagJson[i].total_price;
+        //TODO think if to change to sum only without calc
+        sum += shoppingBagJson[i].quantity * shoppingBagJson[i].price;
     }
     return sum;
 }

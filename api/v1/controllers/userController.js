@@ -40,6 +40,7 @@ function addMeal(req, res, next){
 }
 
 //this method add order to the db
+//this method expect to get the exact order to add to the db
 function addOrder(req, res, next){
     if(req.body.order !== undefined){
         userHandler.addOrder(req.body.order, function(err, order){
