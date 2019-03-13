@@ -20,7 +20,10 @@ var Dish = new Schema({
     },
     sides:[{type: String}],
     changes:[{type: String}],
-    price: Number,
+    price: {
+        type: Number,
+        min: 0
+    },
     icons:[{type: Schema.Types.ObjectId, ref: 'Icon'}],
     imageUrl: String
     },
