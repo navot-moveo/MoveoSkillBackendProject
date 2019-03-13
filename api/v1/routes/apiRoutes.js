@@ -12,6 +12,10 @@ var dishController = require('../controllers/dishController.js');
 var userController = require('../controllers/userController.js');
 var restaurantValidator = require('../validators/restaurantValidator.js');
 var authValidator = require('../validators/authValidator.js');
+var userValidator = require('../validators/userValidator.js');
+var mealValidator = require('../validators/mealValidator.js');
+var dishValidator = require('../validators/dishValidator.js');
+var chefValidator = require('../validators/chefValidator.js');
 
 router.route('/restaurants')
     .post(restaurantValidator.validateCreateRestaurant,restaurantController.addRestaurant)
@@ -27,26 +31,26 @@ router.route('/restaurants/:id')
     .get(restaurantController.getRestaurantActionById);
 
 router.route('/chefs')
-    .post(chefController.addChef);
+    .post(chefValidator.validateCreateChef, chefController.addChef);
 
 router.route('/chefs/:id')
     .get(chefController.getChefById);
 
 router.route('/dishes')
-    .post(dishController.addDish);
+    .post(dishValidator.validateCreateDish, dishController.addDish);
 
 router.route('/dishes/:id')
     .get(dishController.getDishById);
 
 //this route is user actions - so all the actions are protected
 router.route('/users')
-    .put(authValidator.extractToken, userController.verifyAndUpdateUser)
+    .put(authValidator.extractToken, userValidator.ValiditeDataToUpdate, userController.verifyAndUpdateUser)
     
 
 //this route is user actions - so all the actions are protected
 router.route('/users/shoppingBag')
     .get(authValidator.extractToken, userController.verifyToken,userController.getUserShoppingBag)
-    .post(authValidator.extractToken, userController.verifyToken, userController.addMeal,
+    .post(mealValidator.validateCreateMeal,authValidator.extractToken, userController.verifyToken, userController.addMeal,
         userController.updateShoppingBag);
 
 //this route is user actions - so all the actions are protected
@@ -56,7 +60,7 @@ router.route('/users/order')
 
 //sign up a new user
 router.route('/users/signup')
-    .post(userController.addUser, userController.signUser);
+    .post(userValidator.validateCreateUser,userController.addUser, userController.signUser);
 
 //user allready in the db
 router.route('/users/login')
@@ -64,7 +68,7 @@ router.route('/users/login')
 
 //user contact details
 router.route('/users/:id')
-    .get(userController.getUserDetailsById);
+    .get(authValidator.extractToken, userController.verifyToken,userController.getUserDetailsById);
 
 router.route('/admin')
     .post(adminController.addObjectFilter)

@@ -23,6 +23,38 @@ function addUser(req, res, next){
     }
 }
 
+//this method add meal to the meals collection
+function addMeal(req, res, next){
+    if(req.body.meal !== undefined){
+        userHandler.addMeal(req.body.meal, function(err, meal){
+            if(err){
+                next(err);
+            } else{
+                res.locals["meal_id"] = meal._id;
+                next();
+            }
+        });
+    } else {
+        next(new Error("meal field is undefined"));
+    }
+}
+
+//this method add order to the db
+function addOrder(req, res, next){
+    if(req.body.order !== undefined){
+        userHandler.addOrder(req.body.order, function(err, order){
+            if(err){
+                next(err);
+            } else{
+                res.locals['order'] = order;
+                next();
+            }
+        });
+    } else {
+        next(new Error("order field is undefined"));
+    }
+}
+
 //this method get all users in the db
 function getUsers(req, res, next){
     userHandler.getUsers(function(err, users){
@@ -34,9 +66,9 @@ function getUsers(req, res, next){
     });
 }
 
-//find user by id - unique field
+//find user by id 
 function getUserDetailsById(req, res, next){
-    var projectObject = {email:0};
+    var projectObject = {email:0, shopping_bag:0};
     if(req.params.id !== undefined){
         userHandler.findUserById(req.params.id, projectObject, function(err, user){
             if(err){
@@ -49,6 +81,8 @@ function getUserDetailsById(req, res, next){
         next(new Error("id field is undefined"));
     }
 }
+///------methods relate to authenticate stage-----------/////
+
 //this method sign user and send the token of the user
 function signUser(req,res,next){
     //first param is the payload, second param is the privatekey
@@ -93,7 +127,6 @@ function verifyToken(req, res, next){
     })
 }
 
-
 ///-------------protected routes---------///
 //if quantity query param is true then give the size of the shoppingBag
 //else gives the shoppibg bag details including sum of shopping bag
@@ -118,14 +151,16 @@ function getUserShoppingBag(req, res, next){
         }
     });
 }
+
 //this method combines verify token and update user date
+//for update we have to enter the unique field - for now email
 function verifyAndUpdateUser(req,res,next){
     jwt.verify(req.token, secretKey, (err, authData) => {
         if(err){
             next(err);
         } else{
             var uniqueFieldValue = req.body[`${uniquField}`];
-            userHandler.updateUserData(req.body, uniquField, uniqueFieldValue, function(err, user){
+            userHandler.findByUniqueFieldAndUpdateUserData(req.body, uniquField, uniqueFieldValue, function(err, user){
                 if(err) next(err)
                 else{
                     res.send(user);
@@ -135,48 +170,27 @@ function verifyAndUpdateUser(req,res,next){
     })
 }
 
-//this method add meal to the meals collection
-function addMeal(req, res, next){
-    if(req.body.meal !== undefined){
-        userHandler.addMeal(req.body.meal, function(err, meal){
-            if(err){
-                next(err);
-            } else{
-                res.locals["meal_id"] = meal._id;
-                next();
-            }
-        });
-    } else {
-        next(new Error("meal field is undefined"));
-    }
-}
-
 //this method update the shopping bag of a user
 function updateShoppingBag(req, res, next){
     var mealObjectId = res.locals["meal_id"];
     userHandler.updateShoppingBag(req.body.meal, mealObjectId, function(err, user){
-        if(err) next(err)
+        if(err) {
+            //if we couldn't update the shopping bag we want to delete the meal we added
+            userHandler.deleteMealById(mealObjectId, function(deleteErr, deletedMeal){
+                if(deleteErr){
+                    next(new Error("couldn't update shopping bag, and couldn't delete meal from db"));
+                } else{
+                    next(err);
+                }
+            })          
+        }
         else{
             res.send(user);
         }
     }); 
 }
 
-function addOrder(req, res, next){
-    if(req.body.order !== undefined){
-        userHandler.addOrder(req.body.order, function(err, order){
-            if(err){
-                next(err);
-            } else{
-                res.locals['order'] = order;
-                next();
-            }
-        });
-    } else {
-        next(new Error("order field is undefined"));
-    }
-}
-
+//reset the shopping bag after making an order
 function resetUserShoppingBag(req, res, next){
     //the _id of the shopping bag  is the user id
     var userId = res.locals['order'].user_id;
@@ -188,7 +202,9 @@ function resetUserShoppingBag(req, res, next){
         }
     });
 }
+
 ////----------helper methods-------------/////
+//TODO move to userUtil
 function getBoolean(value){
     switch(value){
          case true:

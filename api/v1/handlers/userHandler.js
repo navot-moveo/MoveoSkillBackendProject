@@ -4,6 +4,7 @@ var Meal = require('../../../db/models/mealModel.js');
 var Dish = require('../../../db/models/dishModel.js');
 var Order = require('../../../db/models/orderModel.js');
 
+//this method add user 
 function addUser(user, callback){
     var newUser = new User(userToJson(user));
     newUser.save(function(err, user){
@@ -15,79 +16,14 @@ function addUser(user, callback){
     });
 }
 
-function findUserByUniqueField(uniqueField, valueOfField, projectObject, callback){
-    if(projectObject === undefined){
-        projectObject = {};
-    }
-    var query = {};
-    query[`${uniqueField}`] = valueOfField;
-    User.findOne(query, projectObject)
-    .populate({path:'shopping_bag',select:'-_id' ,model: 'Meal' })
-    .exec(function(err, user){
-        if(err){
+//this method add order 
+function addOrder(order, callback){
+    var newOrder = new Order(orderToJson(order));
+    newOrder.save(function(err, order){
+        if (err){
             callback(err);
-        } else{
-            callback(null, user);
-        }
-    })
-}
-
-//this method find user by id and populate shopping bag
-function findUserById(userId, projectObject, callback){
-    var query = {};
-    query['_id'] = userId;
-    User.findOne(query, projectObject, function(err, user){
-        if(err){
-            callback(err);
-        } else{
-            if(user !== null){
-                callback(null, user);
-            } else{
-                callback(new Error("couldn't find user by id"));
-            }
-            
-        }
-    });
-}
-
-//for now user can only change the username
-function updateUserData(userDataToUpdate, uniqueField, uniqueFieldValue, callback){
-    if(userDataToUpdate === undefined){
-        callback(new Error("Couldn't update user."));
-    } else {
-        var query = {};
-        query[`${uniqueField}`] = uniqueFieldValue;
-        User.findOne(query, function(err, user){
-          if(err || (user === null)) {
-            callback(new Error("Couldn't find user in data base."));
-            } else {
-                user = updateUser(user, userDataToUpdate);
-                User.findOneAndUpdate(query, {$set:user}, {new: true}, function (err, user) {
-                    if(err) {
-                        callback(new Error("Couldn't update user to data base."));
-                    } else {
-                        callback(null,user);
-                    }
-                });
-            }
-        });
-    }
-}
-
-function findByIdAndUpdateUser(userId, dataToUpdate, callback){
-    var query = {};
-    query['_id'] = userId;
-    dataToUpdate = {$set:dataToUpdate};
-    User.findOneAndUpdate(query, dataToUpdate, {new: true}, function(err, user){
-        if(err){
-            callback(err);
-        } else{
-            if(user !== null){
-                callback(null, user);
-            } else{
-                callback(new Error("couldn't find user by id"));
-            }
-            
+        } else {
+            callback(null, order);
         }
     });
 }
@@ -117,12 +53,98 @@ function addMeal(meal, callback){
     })
 }
 
+function deleteMealById(mealObjectId, callback){
+    var query = {};
+    //query['_id'] = mealObjectId;
+    Meal.findByIdAndRemove(mealObjectId, function(err, deletedMeal){
+        if(err) callback(err);
+        else{
+            callback(null, deletedMeal);
+        }
+    })
+}
+
+//this method find user by unique field and populate shopping bag
+function findUserByUniqueField(uniqueField, valueOfField, projectObject, callback){
+    if(projectObject === undefined){
+        projectObject = {};
+    }
+    var query = {};
+    query[`${uniqueField}`] = valueOfField;
+    User.findOne(query, projectObject)
+    .populate({path:'shopping_bag',select:'-_id' ,model: 'Meal' })
+    .exec(function(err, user){
+        if(err){
+            callback(err);
+        } else{
+            if(user !== null){
+                callback(null, user);
+            } else{
+                callback(new Error("couldn't find user by unique field"));
+            }
+        }
+    })
+}
+
+//this method find user by id and populate shopping bag
+function findUserById(userId, projectObject, callback){
+    var query = {};
+    query['_id'] = userId;
+    User.findOne(query, projectObject, function(err, user){
+        if(err){
+            callback(err);
+        } else{
+            if(user !== null){
+                callback(null, user);
+            } else{
+                callback(new Error("couldn't find user by id"));
+            }
+           
+        }
+    });
+}
+
+function findByUniqueFieldAndUpdateUserData(userDataToUpdate, uniqueField, uniqueFieldValue, callback){
+    if(userDataToUpdate === undefined){
+        callback(new Error("Couldn't update user."));
+    } else {
+        var query = {};
+        query[`${uniqueField}`] = uniqueFieldValue;
+        User.findOneAndUpdate(query,{$set:userDataToUpdate} , {new: true}, function(err, user){
+        if(err || (user === null)) {
+            callback(new Error("Couldn't find user in data base."));
+            } else {
+                callback(null,user);
+            }
+        });
+    }
+}
+
+function findByIdAndUpdateUser(userId, dataToUpdate, callback){
+    var query = {};
+    query['_id'] = userId;
+    dataToUpdate = {$set:dataToUpdate};
+    User.findOneAndUpdate(query, dataToUpdate, {new: true}, function(err, user){
+        if(err){
+            callback(err);
+        } else{
+            if(user !== null){
+                callback(null, user);
+            } else{
+                callback(new Error("couldn't find user by id"));
+            }
+            
+        }
+    });
+}
+
 function updateShoppingBag(mealToAdd,mealObjectId, callback){
     if(mealToAdd === undefined){
         callback(new Error("Couldn't update shopping bag."));
     } else {
         var query = {};
         query['_id'] = mealToAdd.user_id;
+        //to get the current shopping bag
         User.findOne(query, function(err, user){
           if(err || (user === null)) {
             callback(new Error("Couldn't find user in the data base."));
@@ -135,7 +157,6 @@ function updateShoppingBag(mealToAdd,mealObjectId, callback){
                     if(err) {
                         callback(new Error("Couldn't update user shopping bag to the data base."));
                     } else {
-                        //todo change to user shopping bag
                         callback(null,user);
                     }
                 });
@@ -144,18 +165,10 @@ function updateShoppingBag(mealToAdd,mealObjectId, callback){
     }
 }
 
-function addOrder(order, callback){
-    var newOrder = new Order(orderToJson(order));
-    newOrder.save(function(err, order){
-        if (err){
-            callback(err);
-        } else {
-            callback(null, order);
-        }
-    });
-}
+
 
 ///--------------------helper methods--------------------///
+//TODO check if to delete this method
 function updateUser(user, update){
     var updateJson = userToJson(update);
     var userJson = userToJson(user);
@@ -179,6 +192,7 @@ function userToJson(user){
     return jsonUser;   
 };
 
+//calculate the total price of the shopping bag
 function sumShoppingBag(shoppingBag){
     var shoppingBagJson = shoppingBag.shopping_bag;
     var sum = 0;
@@ -196,6 +210,7 @@ function orderToJson(order){
     }
     return jsonOrder;
 }
+
 function mealToJson(meal){
     var jsonMeal = 
     {
@@ -215,12 +230,12 @@ function mealToJson(meal){
 module.exports = {
     addUser,
     findUserByUniqueField,
-    updateUserData,
+    findByUniqueFieldAndUpdateUserData,
     findUserById,
     addMeal,
     updateShoppingBag,
     sumShoppingBag,
     addOrder,
-    findByIdAndUpdateUser
-
+    findByIdAndUpdateUser,
+    deleteMealById
 };
