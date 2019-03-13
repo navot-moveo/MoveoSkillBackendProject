@@ -3,6 +3,7 @@
  */
 
 var adminHandler = require('../handlers/adminHandler.js');
+var userHandler = require('../handlers/userHandler.js');
 
 function addIcon(req, res, next){
     adminHandler.addIcon(req.body.icon, function(err, icon){
@@ -27,6 +28,7 @@ function addObjectFilter(req, res, next){
         next(new Error("object type is undefined"));
     }
 }
+
 
 function getObjectFilter(req, res, next){
     if(req.query.objectType !== undefined){

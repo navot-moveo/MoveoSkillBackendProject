@@ -21,7 +21,7 @@ function addChef(req, res, next){
 
 function getChefById(req, res, next){
     if(req.params.id !== undefined){
-        chefHandler.getChegById(req.params.id, function(err, chef){
+        chefHandler.getChefById(req.params.id, function(err, chef){
             if(err){
                 next(err);
             }else {
