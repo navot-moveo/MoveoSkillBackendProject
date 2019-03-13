@@ -112,7 +112,7 @@ function getUserShoppingBag(req, res, next){
                 res.send(sizeOfShoppingBag);
             } else {
                 const totalPrice = userHandler.sumShoppingBag(userShoppingBag);
-                userShoppingBag['totalPrice'] = totalPrice;
+                userShoppingBag['total_price'] = totalPrice;
                 res.send(userShoppingBag);
             }            
         }
@@ -162,7 +162,32 @@ function updateShoppingBag(req, res, next){
     }); 
 }
 
+function addOrder(req, res, next){
+    if(req.body.order !== undefined){
+        userHandler.addOrder(req.body.order, function(err, order){
+            if(err){
+                next(err);
+            } else{
+                res.locals['order'] = order;
+                next();
+            }
+        });
+    } else {
+        next(new Error("order field is undefined"));
+    }
+}
 
+function resetUserShoppingBag(req, res, next){
+    //the _id of the shopping bag  is the user id
+    var userId = res.locals['order'].user_id;
+    var uniqueFieldValue = req.body[`${uniquField}`];
+    userHandler.findByIdAndUpdateUser(userId, {shopping_bag : []}, function(err, user){
+        if(err) next(err)
+        else{
+            res.send(user);
+        }
+    });
+}
 ////----------helper methods-------------/////
 function getBoolean(value){
     switch(value){
@@ -187,5 +212,7 @@ module.exports = {
     verifyToken,
     updateShoppingBag,
     addMeal,
-    getUserShoppingBag
+    getUserShoppingBag,
+    addOrder,
+    resetUserShoppingBag
 };

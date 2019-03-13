@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var User = require('../../../db/models/userModel.js');
 var Meal = require('../../../db/models/mealModel.js');
 var Dish = require('../../../db/models/dishModel.js');
+var Order = require('../../../db/models/orderModel.js');
 
 function addUser(user, callback){
     var newUser = new User(userToJson(user));
@@ -73,6 +74,24 @@ function updateUserData(userDataToUpdate, uniqueField, uniqueFieldValue, callbac
     }
 }
 
+function findByIdAndUpdateUser(userId, dataToUpdate, callback){
+    var query = {};
+    query['_id'] = userId;
+    dataToUpdate = {$set:dataToUpdate};
+    User.findOneAndUpdate(query, dataToUpdate, {new: true}, function(err, user){
+        if(err){
+            callback(err);
+        } else{
+            if(user !== null){
+                callback(null, user);
+            } else{
+                callback(new Error("couldn't find user by id"));
+            }
+            
+        }
+    });
+}
+
 //this method validate that the price of the meal equal to the dish price and add the meal to the db
 function addMeal(meal, callback){
     var newMeal = new Meal(mealToJson(meal));
@@ -96,7 +115,6 @@ function addMeal(meal, callback){
             }
         }
     })
-
 }
 
 function updateShoppingBag(mealToAdd,mealObjectId, callback){
@@ -126,7 +144,16 @@ function updateShoppingBag(mealToAdd,mealObjectId, callback){
     }
 }
 
-
+function addOrder(order, callback){
+    var newOrder = new Order(orderToJson(order));
+    newOrder.save(function(err, order){
+        if (err){
+            callback(err);
+        } else {
+            callback(null, order);
+        }
+    });
+}
 
 ///--------------------helper methods--------------------///
 function updateUser(user, update){
@@ -161,6 +188,14 @@ function sumShoppingBag(shoppingBag){
     return sum;
 }
 
+function orderToJson(order){
+    var jsonOrder = {
+        shopping_bag : order.shopping_bag,
+        total_price : order.totalPrice,
+        user_id : order._id
+    }
+    return jsonOrder;
+}
 function mealToJson(meal){
     var jsonMeal = 
     {
@@ -184,6 +219,8 @@ module.exports = {
     findUserById,
     addMeal,
     updateShoppingBag,
-    sumShoppingBag
+    sumShoppingBag,
+    addOrder,
+    findByIdAndUpdateUser
 
 };

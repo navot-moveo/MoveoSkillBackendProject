@@ -51,7 +51,8 @@ router.route('/users/shoppingBag')
 
 //this route is user actions - so all the actions are protected
 router.route('/users/order')
-    .post(authValidator.extractToken, userController.verifyToken,userController.placeOrder);
+    .post(authValidator.extractToken, userController.verifyToken,userController.addOrder,
+        userController.resetUserShoppingBag);
 
 //sign up a new user
 router.route('/users/signup')
