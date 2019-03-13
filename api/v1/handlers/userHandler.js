@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var User = require('../../../db/models/userModel.js');
 var Meal = require('../../../db/models/mealModel.js');
+var Dish = require('../../../db/models/dishModel.js');
 
 function addUser(user, callback){
     var newUser = new User(userToJson(user));
@@ -13,8 +14,6 @@ function addUser(user, callback){
     });
 }
 
-
-
 function findUserByUniqueField(uniqueField, valueOfField, projectObject, callback){
     if(projectObject === undefined){
         projectObject = {};
@@ -22,7 +21,7 @@ function findUserByUniqueField(uniqueField, valueOfField, projectObject, callbac
     var query = {};
     query[`${uniqueField}`] = valueOfField;
     User.findOne(query, projectObject)
-    .populate({path:'shopping_bag', model: 'Meal' })
+    .populate({path:'shopping_bag',select:'-_id' ,model: 'Meal' })
     .exec(function(err, user){
         if(err){
             callback(err);
@@ -32,6 +31,7 @@ function findUserByUniqueField(uniqueField, valueOfField, projectObject, callbac
     })
 }
 
+//this method find user by id and populate shopping bag
 function findUserById(userId, projectObject, callback){
     var query = {};
     query['_id'] = userId;
@@ -73,16 +73,30 @@ function updateUserData(userDataToUpdate, uniqueField, uniqueFieldValue, callbac
     }
 }
 
-//this method add meal to the db
+//this method validate that the price of the meal equal to the dish price and add the meal to the db
 function addMeal(meal, callback){
     var newMeal = new Meal(mealToJson(meal));
-    newMeal.save(function(err, meal){
-        if (err){
-            callback(err);
-        } else {
-            callback(null, meal);
+    var query = {};
+    query['_id'] = newMeal.dish_id;
+    Dish.findOne(query, (err, dish) => {
+        //errors while searching the dih in the db
+        if(err) callback(err);
+        if(dish === null) callback(new Error("couldn't find the dish in the data base"));
+        else { //we found the dish
+            if(dish.price === newMeal.price){
+                newMeal.save(function(err, meal){
+                    if (err){
+                        callback(err);
+                    } else {
+                        callback(null, meal);
+                    }
+                });
+            } else{
+                callback(new Error("price of the meal is not equal to the price in the menu"));
+            }
         }
-    });
+    })
+
 }
 
 function updateShoppingBag(mealToAdd,mealObjectId, callback){
@@ -111,6 +125,9 @@ function updateShoppingBag(mealToAdd,mealObjectId, callback){
         });
     }
 }
+
+
+
 ///--------------------helper methods--------------------///
 function updateUser(user, update){
     var updateJson = userToJson(update);
@@ -135,16 +152,29 @@ function userToJson(user){
     return jsonUser;   
 };
 
+function sumShoppingBag(shoppingBag){
+    var shoppingBagJson = shoppingBag.shopping_bag;
+    var sum = 0;
+    for (var i = 0; i < shoppingBagJson.length; i++) {
+        sum += shoppingBagJson[i].total_price;
+    }
+    return sum;
+}
+
 function mealToJson(meal){
     var jsonMeal = 
     {
         name: meal.name,
         quantity: meal.quantity,
         changes: meal.changes,
-        sides: meal.sides
+        sides: meal.sides,
+        price: meal.price,
+        total_price: meal.price * meal.quantity,
+        dish_id: meal.dish_id
     }
     return jsonMeal;   
 };
+
 
 
 module.exports = {
@@ -153,5 +183,7 @@ module.exports = {
     updateUserData,
     findUserById,
     addMeal,
-    updateShoppingBag
+    updateShoppingBag,
+    sumShoppingBag
+
 };

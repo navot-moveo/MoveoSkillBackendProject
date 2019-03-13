@@ -38,15 +38,20 @@ router.route('/dishes')
 router.route('/dishes/:id')
     .get(dishController.getDishById);
 
+//this route is user actions - so all the actions are protected
 router.route('/users')
-    .get(authValidator.extractToken, userController.verifyToken,userController.getUserShoppingBag)
     .put(authValidator.extractToken, userController.verifyAndUpdateUser)
-    .post(authValidator.extractToken, userController.verifyToken, userController.addMeal,
-         userController.updateShoppingBag);
+    
 
-//user contact details
-router.route('/users/:id')
-    .get(userController.getUserDetailsById);
+//this route is user actions - so all the actions are protected
+router.route('/users/shoppingBag')
+    .get(authValidator.extractToken, userController.verifyToken,userController.getUserShoppingBag)
+    .post(authValidator.extractToken, userController.verifyToken, userController.addMeal,
+        userController.updateShoppingBag);
+
+//this route is user actions - so all the actions are protected
+router.route('/users/order')
+    .post(authValidator.extractToken, userController.verifyToken,userController.placeOrder);
 
 //sign up a new user
 router.route('/users/signup')
@@ -56,6 +61,9 @@ router.route('/users/signup')
 router.route('/users/login')
     .post(userController.authenticate, userController.signUser);
 
+//user contact details
+router.route('/users/:id')
+    .get(userController.getUserDetailsById);
 
 router.route('/admin')
     .post(adminController.addObjectFilter)

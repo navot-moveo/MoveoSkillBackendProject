@@ -14,7 +14,16 @@ var Meal = new Schema({
         required:'quantity is required'
     },
     changes:[{type:String}],
-    sides:[{type:String}]
+    sides:[{type:String}],
+    price: {
+        type: Number,
+        required:'price is required'
+    },
+    total_price: Number,
+    dish_id:{
+        type: String,
+        required: 'dish id is required'
+    }
 },
     {
         versionKey: false,

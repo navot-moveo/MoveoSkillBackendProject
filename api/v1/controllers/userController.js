@@ -52,8 +52,8 @@ function getUserDetailsById(req, res, next){
 //this method sign user and send the token of the user
 function signUser(req,res,next){
     //first param is the payload, second param is the privatekey
-    //async - this token will be valid for 1h
-    jwt.sign({user:res.locals["userData"]}, secretKey, {expiresIn: '1h' }, (err, token) => {
+    //async - this token will be valid for 3h
+    jwt.sign({user:res.locals["userData"]}, secretKey, {expiresIn: '3h' }, (err, token) => {
         if(err) throw err;
         var userToSend = res.locals["userData"]
         userToSend.token = token
@@ -64,7 +64,7 @@ function signUser(req,res,next){
 //this method checks if the user is in the db(depends on unique field - full_name) and validate that the password is valid 
 function authenticate(req, res, next) {
     const uniquFieldValue = req.body[`${uniquField}`];
-    userHandler.findUserByUniqueField(uniquField, uniquFieldValue, (err, user) => {
+    userHandler.findUserByUniqueField(uniquField, uniquFieldValue,{}, (err, user) => {
         if (err) {
             //user doesn't exist -> can't login
             next(err);
@@ -93,21 +93,31 @@ function verifyToken(req, res, next){
     })
 }
 
+
+///-------------protected routes---------///
+//if quantity query param is true then give the size of the shoppingBag
+//else gives the shoppibg bag details including sum of shopping bag
 function getUserShoppingBag(req, res, next){
     var projectObject = {shopping_bag : 1};
     const uniquFieldValue = req.body[`${uniquField}`];
-    userHandler.findUserByUniqueField(uniquField, uniquFieldValue, projectObject, function(err, userShoppingBag){
+    userHandler.findUserByUniqueField(uniquField, uniquFieldValue, projectObject, function(err, userShoppingBagDoc){
         if(err){
             next(err);
         } else{
-            res.send(userShoppingBag);
+            const userShoppingBag = userShoppingBagDoc.toObject()
+            if(getBoolean(req.query.quantity) === true){
+                var sizeOfShoppingBag = {
+                    size : userShoppingBag.shopping_bag.length
+                }
+                res.send(sizeOfShoppingBag);
+            } else {
+                const totalPrice = userHandler.sumShoppingBag(userShoppingBag);
+                userShoppingBag['totalPrice'] = totalPrice;
+                res.send(userShoppingBag);
+            }            
         }
     });
 }
-
-
-///-------------protected routes---------///
-
 //this method combines verify token and update user date
 function verifyAndUpdateUser(req,res,next){
     jwt.verify(req.token, secretKey, (err, authData) => {
@@ -151,6 +161,22 @@ function updateShoppingBag(req, res, next){
         }
     }); 
 }
+
+
+////----------helper methods-------------/////
+function getBoolean(value){
+    switch(value){
+         case true:
+         case "true":
+         case 1:
+         case "1":
+         case "on":
+         case "yes":
+             return true;
+         default: 
+             return false;
+     }
+ }
 
 module.exports = {
     addUser,
