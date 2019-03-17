@@ -100,7 +100,6 @@ function getAllSpecificCuisineRestaurants(typeOfCuisine, callback){
 
 //this method gives all the restaurant of a specific chef by id
 function getAllSpecificChefRestaurants(chefId, callback){
-    console.log('');
     Restaurant.aggregate([
         { $match: { chef: mongoose.Types.ObjectId(chefId) } },
         { $project : { _id: 0 , imagesUrl : 1, name:1 }} 
@@ -205,7 +204,7 @@ function getRestaurantById(restaurantId, callback){
     });
 }
 //this method select the action to do on a specific restaurant
-function getRestaurantActionById(id, action, callback){
+function getRestaurantActionById(id, action, param, callback){
     switch(action){
         case 'info':
         getRestaurantInfoById(id, callback);
@@ -219,12 +218,45 @@ function getRestaurantActionById(id, action, callback){
         case 'open':
         isRestaurantOpen(id, callback);
         break;
+        case 'dishes':
+        getRestaurantDishes(id, callback);
+        break;
+        case 'edit':
+        editRestaurant(id, param, callback);
+        break;
         default:
         getRestaurantById(id, callback);
         break;
     }
 }
 
+function editRestaurant(restaurantId, dishId, callback){
+    var query = {};
+    var updateDishes = {};
+    query['_id'] = restaurantId;
+    Restaurant.findOne(query, function(err, restaurant){
+        if(err){
+            callback(err);
+        } else{
+            if(restaurant === null){
+                callback(new Error("couldn't find restaurant and edit.")); 
+            } else {
+                restaurant.dishes.push(createObjectId(dishId));
+                updateDishes['dishes'] = restaurant.dishes;
+                Restaurant.findOneAndUpdate(query, updateDishes, {new: true}, function(err, restaurant){
+                    if (err) callback(err);
+                    else {
+                        if(restaurant === null){
+                            callback(new Error("couldn't find restaurant and edit.")); 
+                        } else {
+                        callback(null, restaurant);
+                        }
+                    }
+                })                
+            }          
+        }
+    })
+}
 //this method returns all the dishCatagories of a restaurand by id
 function getRestaurantMenu(restaurantId, callback){
     var query = {};
@@ -236,6 +268,28 @@ function getRestaurantMenu(restaurantId, callback){
             callback(null, menu);
         }
     })
+}
+
+//this method returns all the dishes of a restaurand by id  sorted by catagory name
+function getRestaurantDishes(restaurantId, callback){
+    var query = {};
+    query['_id'] = createObjectId(restaurantId);
+    Restaurant.findOne(query, 'dishes')
+    .populate({
+        path:'dishes',
+        select:'name ingredients price icons catagory',
+        populate: {
+            path: 'icons catagory'
+        }
+    })
+    .exec(function(err, dishes){
+        dishes = sortJsonArrayByField(dishes.dishes, 'catagory.name')
+        if(err){
+            callback(err);
+        } else{
+            callback(null, dishes);
+        }
+    });
 }
 
 //this method returns all the dishCatagories of a restaurand by id
@@ -327,6 +381,15 @@ function convertNumToDay(num){
     }
     return day;
 }
+
+function sortJsonArrayByField(jsonArray, fieldName){
+    return jsonArray.sort(SortByCatagory);
+}
+
+function SortByCatagory(firstDish,secondDish) {
+    return ((firstDish.catagory.name == secondDish.catagory.name) ? 0 : ((firstDish.catagory.name > secondDish.catagory.name) ? 1 : -1 ));
+}
+
 
 //this method checks is the restaurant is open right now
 //if yes return json with value true, else return json with value false

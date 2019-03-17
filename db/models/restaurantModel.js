@@ -21,32 +21,88 @@ var Restaurant = new Schema(
     },
     openingHours:{ 
         sunday: {
-            open: Number,
-            close: Number
+            open: {
+                type: Number,
+                min:0,
+                max:23.5
+            },
+            close: {
+                type: Number,
+                min:0,
+                max:23.5
+            }
         },
         monday: {
-            open: Number,
-            close: Number
+            open: {
+                type: Number,
+                min:0,
+                max:23.5
+            },
+            close: {
+                type: Number,
+                min:0,
+                max:23.5
+            }
         },
         tuesday: {
-            open: Number,
-            close: Number
+            open: {
+                type: Number,
+                min:0,
+                max:23.5
+            },
+            close: {
+                type: Number,
+                min:0,
+                max:23.5
+            }
         },
         wednesday: {
-            open: Number,
-            close: Number
+            open: {
+                type: Number,
+                min:0,
+                max:23.5
+            },
+            close: {
+                type: Number,
+                min:0,
+                max:23.5
+            }
         },
         thursday: {
-            open: Number,
-            close: Number
+            open: {
+                type: Number,
+                min:0,
+                max:23.5
+            },
+            close: {
+                type: Number,
+                min:0,
+                max:23.5
+            }
         },
         friday: {
-            open: Number,
-            close: Number
+            open: {
+                type: Number,
+                min:0,
+                max:23.5
+            },
+            close: {
+                type: Number,
+                min:0,
+                max:23.5
+            }
         },
         saturday: {
-            open: Number,
-            close: Number
+            open: {
+                type: Number,
+                min:0,
+                max:23.5
+            },
+            close: {
+                type: Number,
+                min:0,
+                max:23.5
+            }
         }
     },
     openingDate: {

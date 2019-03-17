@@ -138,14 +138,14 @@ function getUserShoppingBag(req, res, next){
         if(err){
             next(err);
         } else{
-            const userShoppingBag = userShoppingBagDoc.toObject()
+            const userShoppingBag = userToJson(userShoppingBagDoc);
             if(getBoolean(req.query.quantity) === true){
                 var sizeOfShoppingBag = {
                     size : userShoppingBag.shopping_bag.length
                 }
                 res.send(sizeOfShoppingBag);
             } else {
-                const totalPrice = userHandler.sumShoppingBag(userShoppingBag);
+                const totalPrice = userHandler.sumShoppingBag(userShoppingBag.shopping_bag);
                 userShoppingBag['total_price'] = totalPrice;
                 res.send(userShoppingBag);
             }            
@@ -186,7 +186,10 @@ function updateShoppingBag(req, res, next){
             })          
         }
         else{
-            res.send(user);
+            const updatedUser = userToJson(user);
+            const totalPrice = userHandler.sumShoppingBag(updatedUser.shopping_bag);
+            updatedUser['total_price'] = totalPrice;
+            res.send(updatedUser);
         }
     }); 
 }
@@ -199,7 +202,7 @@ function resetUserShoppingBag(req, res, next){
     userHandler.findByIdAndUpdateUser(userId, {shopping_bag : []}, function(err, user){
         if(err) next(err)
         else{
-            res.send(user);
+            res.send("your order has been made. Thank you for using our service");
         }
     });
 }
@@ -219,6 +222,14 @@ function getBoolean(value){
              return false;
      }
  }
+
+function userToJson(user){
+    const updatedUser = user.toObject();
+    delete updatedUser.password;
+    delete updatedUser.createdAt;
+    delete updatedUser.updatedAt;
+    return updatedUser;
+}
 
 module.exports = {
     addUser,

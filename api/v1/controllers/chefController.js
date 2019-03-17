@@ -33,9 +33,18 @@ function getChefById(req, res, next){
     }
 }
 
-
+function getChefs(req, res, next){
+    chefHandler.getChefs(function(err, chefs){
+        if(err){
+            next(err);
+        } else{
+            res.send(chefs);
+        }
+    });
+}
 
 module.exports = {
     addChef,
-    getChefById
+    getChefById,
+    getChefs
 };

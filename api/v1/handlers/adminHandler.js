@@ -98,14 +98,14 @@ function getUsers(callback){
 
 function getOrdersOfUserByUserId(userId, callback){
     var query = {};
-    query['user_id'] = userId;
-    Order.find(query,function(err, orders){
+    query['user_id'] = userId;    
+    Order.find(query, {_id:0,'shopping_bag.dish_id':0 ,'shopping_bag.createdAt':0 ,'shopping_bag.updatedAt':0, user_id:0},function(err, orders){
         if(err){
             callback(err);
         } else{
             callback(null, orders);
         }
-    });  
+    });        
 }
 
 

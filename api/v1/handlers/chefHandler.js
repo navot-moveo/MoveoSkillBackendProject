@@ -34,9 +34,19 @@ function chefToJson(chef){
     return jsonChef;   
 };
 
-
+function getChefs(callback){
+    Chef.find({},'name imageUrl')
+    .exec(function(err, chefs){
+        if(err){
+            callback(err);
+        } else{
+            callback(null, chefs);
+        }
+    })  
+}
 
 module.exports = {
     addChef,
-    getChefById
+    getChefById,
+    getChefs
 };

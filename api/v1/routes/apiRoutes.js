@@ -27,10 +27,12 @@ router.route('/restaurants/search')
     .get(restaurantController.searchRestaurant);
 
 router.route('/restaurants/:id')
-    .get(restaurantController.getRestaurantActionById);
+    .get(restaurantController.getRestaurantActionById)
+    .put(restaurantController.getRestaurantActionById);
 
 router.route('/chefs')
-    .post(chefValidator.validateCreateChef, chefController.addChef);
+    .post(chefValidator.validateCreateChef, chefController.addChef)
+    .get(chefController.getChefs);
 
 router.route('/chefs/:id')
     .get(chefController.getChefById);

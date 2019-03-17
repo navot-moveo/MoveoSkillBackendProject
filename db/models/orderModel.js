@@ -12,7 +12,8 @@ var Order = new Schema({
     shopping_bag:{
         type: Object,
         required:'shopping bag is required'
-    }
+    },
+    total_price: Number
 },
     {
         versionKey: false,

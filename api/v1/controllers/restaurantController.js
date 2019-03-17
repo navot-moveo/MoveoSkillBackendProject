@@ -30,18 +30,18 @@ function getRestaurantsSortedBy(req, res, next){
 }
 
 function getAllRestaurants(req, res, next){
-    restaurantHandler.getRestaurants(function(err, restaurant){
+    restaurantHandler.getRestaurants(function(err, restaurants){
         if(err){
             next(err);
         } else{
-            res.send(restaurant);
+            res.send(restaurants);
         }
     });
 }
 
 function getRestaurantActionById(req,res,next){
     if(req.params.id !== undefined){
-        restaurantHandler.getRestaurantActionById(req.params.id, req.query.action, function(err, restaurant){
+        restaurantHandler.getRestaurantActionById(req.params.id, req.query.action, req.query.param, function(err, restaurant){
             if(err){
                 next(err);
             } else{
@@ -51,8 +51,8 @@ function getRestaurantActionById(req,res,next){
     } else {
         next(new Error("id field is undefined"));
     }
-
 }
+
 
 function getAllRestaurantsCuisine(req,res,next){
     restaurantHandler.getAllRestaurantsCuisine(function(err, restaurant){

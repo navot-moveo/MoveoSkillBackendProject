@@ -72,7 +72,7 @@ function findUserByUniqueField(uniqueField, valueOfField, projectObject, callbac
     var query = {};
     query[`${uniqueField}`] = valueOfField;
     User.findOne(query, projectObject)
-    .populate({path:'shopping_bag',select:'-_id' ,model: 'Meal' })
+    .populate({path:'shopping_bag',select:'-_id -updatedAt -createdAt -dish_id' ,model: 'Meal' })
     .exec(function(err, user){
         if(err){
             callback(err);
@@ -152,12 +152,11 @@ function updateShoppingBag(mealToAdd,mealObjectId, callback){
                 //this is the shoping bag we want to update in the db
                 user.shopping_bag = user.shopping_bag.push(mealObjectId);
                 User.findOneAndUpdate(query, {$set:user}, {new: true})
-                .populate({path:'shopping_bag', model: 'Meal' })
+                .populate({path:'shopping_bag',select:'-updatedAt -createdAt', model: 'Meal' })
                 .exec( function (err, user) {
                     if(err) {
                         callback(new Error("Couldn't update user shopping bag to the data base."));
                     } else {
-                        user.total_price = sumShoppingBag(user.shopping_bag);
                         callback(null,user);
                     }
                 });
@@ -195,11 +194,11 @@ function userToJson(user){
 
 //calculate the total price of the shopping bag
 function sumShoppingBag(shoppingBag){
-    var shoppingBagJson = shoppingBag.shopping_bag;
+    //var shoppingBagJson = shoppingBag.shopping_bag;
     var sum = 0;
-    for (var i = 0; i < shoppingBagJson.length; i++) {
+    for (var i = 0; i < shoppingBag.length; i++) {
         //TODO think if to change to sum only without calc
-        sum += shoppingBagJson[i].quantity * shoppingBagJson[i].price;
+        sum += shoppingBag[i].quantity * shoppingBag[i].price;
     }
     return sum;
 }
@@ -207,7 +206,7 @@ function sumShoppingBag(shoppingBag){
 function orderToJson(order){
     var jsonOrder = {
         shopping_bag : order.shopping_bag,
-        total_price : order.totalPrice,
+        total_price : order.total_price,
         user_id : order._id
     }
     return jsonOrder;
