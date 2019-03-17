@@ -165,6 +165,23 @@ function updateShoppingBag(mealToAdd,mealObjectId, callback){
     }
 }
 
+function updatePassword(uniqueField, uniqueFieldValue, user, passwordToUpdate, callback){
+    var query = {};
+    var updatedPassword = {};
+    query[`${uniqueField}`] = uniqueFieldValue;
+    user.hashPassword(passwordToUpdate, function(err, hash){
+        updatedPassword['password'] = hash;
+        User.findOneAndUpdate(query, updatedPassword, {new:true}, function(err, user){
+            if(err) {
+                callback(err);
+            }
+            else{
+                callback(null, user);
+            }
+        })
+    })
+}
+
 
 
 ///--------------------helper methods--------------------///
@@ -238,5 +255,6 @@ module.exports = {
     sumShoppingBag,
     addOrder,
     findByIdAndUpdateUser,
-    deleteMealById
+    deleteMealById,
+    updatePassword
 };
