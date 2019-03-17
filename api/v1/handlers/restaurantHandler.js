@@ -228,12 +228,24 @@ function getRestaurantActionById(id, action, param, callback){
         case 'edit':
         addRestaurantDishes(id, param, callback);
         break;
+        case 'dishCatagory':
+        getRestaurantSpecificCatagoryDishes(id, param, callback);
+        break;
         default:
         getRestaurantById(id, callback);
         break;
     }
 }
 
+function getRestaurantSpecificCatagoryDishes(restaurantId, dishCatagory, callback){
+    getRestaurantDishes(restaurantId, function(err, restaurant){
+        if(err) callback(err);
+        else{
+            var dishesByCatagory = getDishesByCatagory(restaurant, dishCatagory);
+            callback(null, dishesByCatagory);
+        }
+    })
+}
 function addRestaurantDishes(restaurantId, dishId, callback){
     var query = {};
     var updateDishes = {};
@@ -401,12 +413,20 @@ function SortByCatagory(firstDish,secondDish) {
     return ((firstDish.catagory.name == secondDish.catagory.name) ? 0 : ((firstDish.catagory.name > secondDish.catagory.name) ? 1 : -1 ));
 }
 
-
+function getDishesByCatagory(arrayOfDishes, dishCatagory){
+    var arrayOfDishesByCatagory = [];
+    for(var i = 0; i <  arrayOfDishes.length; i++){
+        var dishJson = arrayOfDishes[i].toObject();
+        if(dishJson.catagory.name === dishCatagory){
+            arrayOfDishesByCatagory.push(dishJson);
+        }
+    }
+    return arrayOfDishesByCatagory; 
+}
 //this method checks is the restaurant is open right now
 //if yes return json with value true, else return json with value false
 function checkIfRestaurantOpen(openingHoursOfToday) {
-    //var hour = moment(new Date()).hour();
-    var hour = 9;
+    var hour = moment(new Date()).hour();
     if((12 <= openingHoursOfToday.open  && openingHoursOfToday.close <= 12)){
         openingHoursOfToday.close += 24;
         if(0 <= hour && hour < 12) {

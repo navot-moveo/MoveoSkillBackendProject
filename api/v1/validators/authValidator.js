@@ -32,6 +32,7 @@ function verifyToken(req, res, next){
         }
     })
 }
+
 //this mathod verify admins token
 function verifyAdminToken(req, res, next){
     jwt.verify(req.token, secretAdminKey, (err, authData) => {
