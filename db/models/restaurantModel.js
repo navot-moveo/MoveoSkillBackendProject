@@ -16,8 +16,12 @@ var Restaurant = new Schema(
         required:'chef is required'
     },
     cuisine: {
-        type: String,
-        required:'cuisine is required'
+        name:{
+            type:String
+        },
+        imageUrl: {
+            type:String
+        }
     },
     openingHours:{ 
         sunday: {

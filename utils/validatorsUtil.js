@@ -29,5 +29,6 @@ function convertErrorsToArray(errors){
 
 module.exports = {
     checkField,
-    isPositive
+    isPositive,
+    convertErrorsToArray
 };

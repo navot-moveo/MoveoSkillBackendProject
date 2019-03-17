@@ -12,7 +12,7 @@ function validateCreateRestaurant(req,res,next){
         }
     });
     req.check('restaurant.chef', "chef doesn't exists").exists(),
-    req.check('restaurant.cuisine',"cuisine doesn't exists").exists(),
+    //req.check('restaurant.cuisine.name',"cuisine doesn't exists").exists(),
     req.check('restaurant.openingDate',"opening date doesn't exists").exists(),
     req.check('restaurant.phone',"phone number is invalid").isNumeric(),
     req.check('restaurant.openingDate',"opening date is after today").isBefore(),

@@ -86,7 +86,7 @@ function getOpenRestaurants(callback) {
 //returns all the restaurant from a specific cuisine
 function getAllSpecificCuisineRestaurants(typeOfCuisine, callback){
     var query = {};
-    query["cuisine"] = typeOfCuisine
+    query["cuisine.name"] = typeOfCuisine
     Restaurant.find(query,'name chef cuisine imagesUrl')
     .populate('chef', 'name')
     .exec(function(err, restaurants){
@@ -125,7 +125,11 @@ function getAllRestaurantsSortedBy(sortField, param, callback){
         getOpenRestaurants(callback);
         break;
         case 'cuisine':
-        getAllSpecificCuisineRestaurants(param, callback);
+        if(param == 'allRestaurants'){
+            getAllRestaurants(callback);
+        } else{
+            getAllSpecificCuisineRestaurants(param, callback);
+        }    
         break;
         case 'chef':
         getAllSpecificChefRestaurants(param, callback);
@@ -222,7 +226,7 @@ function getRestaurantActionById(id, action, param, callback){
         getRestaurantDishes(id, callback);
         break;
         case 'edit':
-        editRestaurant(id, param, callback);
+        addRestaurantDishes(id, param, callback);
         break;
         default:
         getRestaurantById(id, callback);
@@ -230,7 +234,7 @@ function getRestaurantActionById(id, action, param, callback){
     }
 }
 
-function editRestaurant(restaurantId, dishId, callback){
+function addRestaurantDishes(restaurantId, dishId, callback){
     var query = {};
     var updateDishes = {};
     query['_id'] = restaurantId;
@@ -312,11 +316,18 @@ function getAllRestaurantsCuisine(callback){
     Restaurant.find().distinct('cuisine',function(err, restaurants){
         if(err){
             callback(err);
-        } else{
-            callback(null, restaurants);
-        }
-    })
-};
+        } else {
+                var allRestaurantObject = {
+                    "name":"allRestaurants",
+                    "imageUrl":"www.allRestaurants.com"
+                }
+                restaurants.push(allRestaurantObject);
+                callback(null, restaurants);
+        }  
+    });
+}
+
+
 
 //this method is searching by restaurant, chef, cuisine
 function searchRestaurant(q, searchField, callback){
@@ -417,7 +428,7 @@ function convertSearchFieldToJsonField(searchField){
     } else if(searchField === 'restaurant'){
         searchField = 'name';
     } else if(searchField === 'cuisine'){
-        searchField = 'cuisine';
+        searchField = 'cuisine.name';
     }
     return searchField;
 }
