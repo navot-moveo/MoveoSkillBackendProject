@@ -15,6 +15,7 @@ var userValidator = require('../validators/userValidator.js');
 var mealValidator = require('../validators/mealValidator.js');
 var dishValidator = require('../validators/dishValidator.js');
 var chefValidator = require('../validators/chefValidator.js');
+var adminValidator = require('../validators/adminValidator.js'); 
 
 router.route('/restaurants')
     .post(restaurantValidator.validateCreateRestaurant,restaurantController.addRestaurant)
@@ -56,15 +57,12 @@ router.route('/users/shoppingBag')
 
 //this route is user actions - so all the actions are protected
 router.route('/users/order')
-<<<<<<< HEAD
     .post(authValidator.extractToken, authValidator.verifyToken,userController.addOrder,
-=======
-    .post(authValidator.extractToken, userController.verifyToken, userController.addOrder,
->>>>>>> feature/forget_password
         userController.resetUserShoppingBag);
 
+//this route is user actions - so all the actions are protected
 router.route('/users/password')
-    .post(authValidator.extractToken, userController.verifyToken, userController.authenticate,
+    .post(authValidator.extractToken, authValidator.verifyToken, userController.authenticate,
          userController.updatePassword);
 
 //sign up a new user
@@ -79,21 +77,20 @@ router.route('/users/login')
 router.route('/users/:id')
     .get(authValidator.extractToken, authValidator.verifyToken, userController.getUserDetailsById);
 
-router.route('/admin')
-    .post(adminController.addObjectFilter)
-    .get(adminController.getObjectFilter);
 
-router.route('/addAdmin')
-    .post(adminController.addAdmin);
+//admins operations
+router.route('/admin/signup')
+    .post(adminValidator.validateCreateAdmin,adminController.addAdmin, adminController.signAdmin);
 
-router.route('/admins/signup')
-    .post(adminController.addAdmin, adminController.signAdmin);
-
-//user allready in the db
-router.route('/admins/login')
+//admin allready in the db
+router.route('/admin/login')
     .post(adminController.authenticate, adminController.signAdmin);
 
+//protected routes - only admin operation
 router.route('/admin/orders')
-    .get(authValidator.extractToken, authValidator.verifyToken, adminController.getOrdersOfUserByUserId);
-    
+    .get(authValidator.extractToken, authValidator.verifyAdminToken, adminController.getOrdersOfUserByUserId);
+  
+router.route('/admin')
+    .post(authValidator.extractToken, authValidator.verifyAdminToken, adminController.addObjectFilter)
+    .get(authValidator.extractToken, authValidator.verifyAdminToken, adminController.getObjectFilter);
 module.exports = router;

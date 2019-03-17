@@ -13,7 +13,8 @@ var Admin = new Schema({
     password:{
         type: String,
         required:'password is required'
-    }
+    },
+    token: String
 });
 
 Admin.pre('save', function(next){

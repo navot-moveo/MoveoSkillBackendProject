@@ -34,7 +34,7 @@ function validateCreateMeal(req,res,next){
     });
     var errors = req.validationErrors();
     if(errors) {
-        next(convertErrorsToArray(errors));
+        next(validatorsUtil.convertErrorsToArray(errors));
     }else{
         next();
     }

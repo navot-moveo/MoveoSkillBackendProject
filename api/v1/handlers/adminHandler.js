@@ -4,6 +4,7 @@ var DishCatagory = require('../../../db/models/dishCatagoryModel.js');
 var User = require('../../../db/models/userModel.js');
 var Order = require('../../../db/models/orderModel.js');
 var Admin = require('../../../db/models/adminModel.js');
+
 //this method add admin 
 function addAdmin(admin, callback){
     var newAdmin = new Admin(adminToJson(admin));
@@ -108,7 +109,7 @@ function getUsers(callback){
     });
 }
 
-function findAdminByUniqueField(uniqueField, valueOfUniqueField){
+function findAdminByUniqueField(uniqueField, valueOfUniqueField, callback){
     var query = {};
     query[`${uniqueField}`] = valueOfUniqueField;
     Admin.findOne(query)
