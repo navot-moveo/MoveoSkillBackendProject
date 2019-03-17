@@ -1,4 +1,6 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
+const secretKey = 'secret';
 
 //this method extract the token from the headers and put it in the request
 //token Format : bearer <access_token>
@@ -19,6 +21,17 @@ function extractToken(req, res, next){
     }
 }
 
+function verifyToken(req, res, next){
+    jwt.verify(req.token, secretKey, (err, authData) => {
+        if(err){
+            next(err);
+        } else{
+            next();
+        }
+    })
+}
+
 module.exports = {
-    extractToken
+    extractToken,
+    verifyToken
 }

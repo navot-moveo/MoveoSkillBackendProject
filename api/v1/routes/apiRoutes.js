@@ -50,13 +50,13 @@ router.route('/users')
 
 //this route is user actions - so all the actions are protected
 router.route('/users/shoppingBag')
-    .get(authValidator.extractToken, userController.verifyToken,userController.getUserShoppingBag)
-    .post(mealValidator.validateCreateMeal,authValidator.extractToken, userController.verifyToken, userController.addMeal,
+    .get(authValidator.extractToken, authValidator.verifyToken,userController.getUserShoppingBag)
+    .post(mealValidator.validateCreateMeal,authValidator.extractToken, authValidator.verifyToken, userController.addMeal,
         userController.updateShoppingBag);
 
 //this route is user actions - so all the actions are protected
 router.route('/users/order')
-    .post(authValidator.extractToken, userController.verifyToken,userController.addOrder,
+    .post(authValidator.extractToken, authValidator.verifyToken,userController.addOrder,
         userController.resetUserShoppingBag);
 
 //sign up a new user
@@ -69,13 +69,23 @@ router.route('/users/login')
 
 //user contact details
 router.route('/users/:id')
-    .get(authValidator.extractToken, userController.verifyToken,userController.getUserDetailsById);
+    .get(authValidator.extractToken, authValidator.verifyToken, userController.getUserDetailsById);
 
 router.route('/admin')
     .post(adminController.addObjectFilter)
     .get(adminController.getObjectFilter);
 
+router.route('/addAdmin')
+    .post(adminController.addAdmin);
+
+router.route('/admins/signup')
+    .post(adminController.addAdmin, adminController.signAdmin);
+
+//user allready in the db
+router.route('/admins/login')
+    .post(adminController.authenticate, adminController.signAdmin);
+
 router.route('/admin/orders')
-    .get(adminController.getOrdersOfUserByUserId);
+    .get(authValidator.extractToken, authValidator.verifyToken, adminController.getOrdersOfUserByUserId);
     
 module.exports = router;

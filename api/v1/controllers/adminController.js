@@ -4,6 +4,58 @@
 
 var adminHandler = require('../handlers/adminHandler.js');
 var userHandler = require('../handlers/userHandler.js');
+const uniquField = 'name';
+const jwt = require('jsonwebtoken');
+const secretKey = 'secret';
+const authUtil = require('../../../utils/authUtil.js');
+
+//this method add admin to the db
+function addAdmin(req, res, next){
+    if(req.body.admin !== undefined){
+        adminHandler.addAdmin(req.body.admin, function(err, admin){
+            if(err){
+                res.send(err);
+            } else{
+                res.locals["admin"] = admin;
+                res.send(admin);
+            }
+        });
+    } else {
+        next(new Error("admin field is undefined"));
+    }
+}
+
+function signAdmin(req,res,next){
+    //first param is the payload, second param is the privatekey
+    //async - this token will be valid for 8h
+    jwt.sign({admin:res.locals["adminData"]}, secretKey, {expiresIn: '8h' }, (err, token) => {
+        if(err) throw err;
+        var adminToSend = res.locals["adminData"]
+        adminToSend.token = token
+        res.send(adminToSend);
+    });
+}
+
+function authenticate(req, res, next) {
+    const uniquFieldValue = req.body[`${uniquField}`];
+    adminHandler.findAdminByUniqueField(uniquField, uniquFieldValue,{}, (err, admin) => {
+        if (err) {
+            //admin doesn't exist -> can't login
+            next(err);
+        } else {
+            //admin exist-> compare plain password and hashed password       
+            authUtil.comparePasswords(req.body.password, admin.password, (err) => {
+                if(err){
+                    //password isn't correct
+                    next(err);
+                } else{
+                    res.locals["adminData"] = admin;
+                    next();
+                }
+            })
+        }
+    });
+}
 
 function addIcon(req, res, next){
     adminHandler.addIcon(req.body.icon, function(err, icon){
@@ -62,5 +114,8 @@ module.exports = {
     addIcon,
     addObjectFilter,
     getObjectFilter,
-    getOrdersOfUserByUserId
+    getOrdersOfUserByUserId,
+    addAdmin,
+    authenticate,
+    signAdmin
 };

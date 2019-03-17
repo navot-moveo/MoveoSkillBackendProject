@@ -118,15 +118,6 @@ function authenticate(req, res, next) {
     });
 }
 
-function verifyToken(req, res, next){
-    jwt.verify(req.token, secretKey, (err, authData) => {
-        if(err){
-            next(err);
-        } else{
-            next();
-        }
-    })
-}
 
 ///-------------protected routes---------///
 //if quantity query param is true then give the size of the shoppingBag
@@ -237,7 +228,6 @@ module.exports = {
     authenticate,
     verifyAndUpdateUser,
     getUserDetailsById,
-    verifyToken,
     updateShoppingBag,
     addMeal,
     getUserShoppingBag,

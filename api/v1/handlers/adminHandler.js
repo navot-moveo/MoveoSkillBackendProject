@@ -3,6 +3,18 @@ var Icon = require('../../../db/models/iconModel.js');
 var DishCatagory = require('../../../db/models/dishCatagoryModel.js');
 var User = require('../../../db/models/userModel.js');
 var Order = require('../../../db/models/orderModel.js');
+var Admin = require('../../../db/models/adminModel.js');
+//this method add admin 
+function addAdmin(admin, callback){
+    var newAdmin = new Admin(adminToJson(admin));
+    newAdmin.save(function(err, admin){
+        if (err){
+            callback(err);
+        } else {
+            callback(null, admin);
+        }
+    });
+}
 
 function addIcon(icon, callback){
     var newIcon = new Icon(iconToJson(icon));
@@ -96,6 +108,23 @@ function getUsers(callback){
     });
 }
 
+function findAdminByUniqueField(uniqueField, valueOfUniqueField){
+    var query = {};
+    query[`${uniqueField}`] = valueOfUniqueField;
+    Admin.findOne(query)
+    .exec(function(err, admin){
+        if(err){
+            callback(err);
+        } else{
+            if(admin !== null){
+                callback(null, admin);
+            } else{
+                callback(new Error("couldn't find admin by unique field"));
+            }
+        }
+    })
+}
+
 function getOrdersOfUserByUserId(userId, callback){
     var query = {};
     query['user_id'] = userId;    
@@ -108,11 +137,21 @@ function getOrdersOfUserByUserId(userId, callback){
     });        
 }
 
+function adminToJson(admin){
+    var jsonAdmin = 
+    {
+        name: admin.name,
+        password: admin.password
+    }
+    return jsonAdmin;     
+}
 
 
 module.exports = {
     addIcon,
     addObjectFilter,
     getObjectFilter,
-    getOrdersOfUserByUserId
+    getOrdersOfUserByUserId,
+    addAdmin,
+    findAdminByUniqueField
 };
