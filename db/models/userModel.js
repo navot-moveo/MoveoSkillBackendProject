@@ -56,6 +56,17 @@ User.pre('save', function(next){
     }
 });
 
+User.methods.hashPassword = function (password, callback) {
+    bcrypt.hash(password, constantSalt, function(err, hash){
+        if(err){
+            return next(err);
+        } else{
+            callback(null, hash);
+        }
+    });
+}
+
+
 User.set('toJSON', {
     transform:function(doc, ret, options){
         delete ret._id;

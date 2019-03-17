@@ -207,6 +207,23 @@ function resetUserShoppingBag(req, res, next){
     });
 }
 
+function updatePassword(req, res, next){
+    if(req.body.password === undefined){
+        next(new Error("please enter password to update"));
+    } else{
+        const uniquFieldValue = req.body[`${uniquField}`];
+        var user = res.locals["userData"];
+        userHandler.updatePassword(uniquField, uniquFieldValue, user, req.body.new_password, function(err, user){
+            if(err){
+                res.send(err);
+            } else { 
+                res.send("password has been changed.")
+            }
+        })
+    }
+}
+
+
 ////----------helper methods-------------/////
 //TODO move to userUtil
 function getBoolean(value){
@@ -242,5 +259,6 @@ module.exports = {
     addMeal,
     getUserShoppingBag,
     addOrder,
-    resetUserShoppingBag
+    resetUserShoppingBag,
+    updatePassword
 };
