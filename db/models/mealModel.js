@@ -28,7 +28,8 @@ var Meal = new Schema({
     dish_id:{
         type: String,
         required: 'dish id is required'
-    }
+    },
+    imageUrl:String
 },
     {
         versionKey: false,

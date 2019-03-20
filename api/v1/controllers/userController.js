@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const secretKey = 'secret';
 const authUtil = require('../../../utils/authUtil.js');
 const uniquField = 'email';
+var Meal = require('../../../db/models/mealModel.js');
 
 //this method add user to the db
 function addUser(req, res, next){
@@ -43,14 +44,18 @@ function addMeal(req, res, next){
 //this method expect to get the exact order to add to the db
 function addOrder(req, res, next){
     if(req.body.order !== undefined){
-        userHandler.addOrder(req.body.order, function(err, order){
-            if(err){
-                next(err);
-            } else{
-                res.locals['order'] = order;
-                next();
-            }
-        });
+        if(req.body.order.shopping_bag.length === 0){
+            next(new Error("couldn't make the order. shopping bag is empty"));
+        } else {
+            userHandler.addOrder(req.body.order, function(err, order){
+                if(err){
+                    next(err);
+                } else{
+                    res.locals['order'] = order;
+                    next();
+                }
+            });
+        }
     } else {
         next(new Error("order field is undefined"));
     }
@@ -82,6 +87,8 @@ function getUserDetailsById(req, res, next){
         next(new Error("id field is undefined"));
     }
 }
+
+
 ///------methods relate to authenticate stage-----------/////
 
 //this method sign user and send the token of the user
@@ -214,6 +221,29 @@ function updatePassword(req, res, next){
     }
 }
 
+//this method contact with admin
+function contactUs(req, res, next){
+    if(req.body.email === undefined || req.body.message === undefined ){
+        next(new Error("please enter mail, password, name and message to contact us."))
+    } else{
+        userHandler.contactUs(req.body.email, req.body.message, function(err, response){
+            if(err) next(err);
+            else{
+                res.send("Thank you for your message. The mail has been sent. we will be back in touch with you soon.");
+            }
+        })
+    }
+}
+
+function termsOfUse(req, res, next){
+    userHandler.termsOfUse(function(err, termsOfUser){
+        if(err){
+            next(err);
+        } else {
+            res.send(termsOfUse);
+        }
+    })
+}
 
 ////----------helper methods-------------/////
 //TODO move to userUtil
@@ -250,5 +280,7 @@ module.exports = {
     getUserShoppingBag,
     addOrder,
     resetUserShoppingBag,
-    updatePassword
+    updatePassword,
+    contactUs,
+    termsOfUse
 };

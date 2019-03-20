@@ -246,6 +246,7 @@ function getRestaurantSpecificCatagoryDishes(restaurantId, dishCatagory, callbac
         }
     })
 }
+
 function addRestaurantDishes(restaurantId, dishId, callback){
     var query = {};
     var updateDishes = {};

@@ -2,8 +2,10 @@ var mongoose = require('mongoose');
 var Icon = require('../../../db/models/iconModel.js');
 var DishCatagory = require('../../../db/models/dishCatagoryModel.js');
 var User = require('../../../db/models/userModel.js');
+var Meal = require('../../../db/models/mealModel.js');
 var Order = require('../../../db/models/orderModel.js');
 var Admin = require('../../../db/models/adminModel.js');
+var schedule = require('node-schedule');
 
 //this method add admin 
 function addAdmin(admin, callback){
@@ -146,6 +148,23 @@ function adminToJson(admin){
     }
     return jsonAdmin;     
 }
+
+//this method are cleaning the meal db every 24 hours at 00:00 at night
+var cleanMealDb = schedule.scheduleJob('0 0 * * *', function(){
+    try {
+        Meal.deleteMany({}, function(err){
+            if (err) {
+                console.log(err)
+            } else {
+                console.log('success');
+            } 
+        });
+     } catch (err) {
+         console.log(err);
+     }
+});
+
+
 
 
 module.exports = {

@@ -3,6 +3,15 @@ var User = require('../../../db/models/userModel.js');
 var Meal = require('../../../db/models/mealModel.js');
 var Dish = require('../../../db/models/dishModel.js');
 var Order = require('../../../db/models/orderModel.js');
+//for support mails
+const adminMail = "navot@moveo.co.il";
+const nodemailer = require("nodemailer");
+const { google } = require("googleapis");
+const OAuth2 = google.auth.OAuth2;
+var fs = require('fs'),
+    PDFParser = require("pdf2json");
+
+
 
 //this method add user 
 function addUser(user, callback){
@@ -39,6 +48,7 @@ function addMeal(meal, callback){
         if(dish === null) callback(new Error("couldn't find the dish in the data base"));
         else { //we found the dish
             if(dish.price === newMeal.price){
+                newMeal.imageUrl = dish.imageUrl;
                 newMeal.save(function(err, meal){
                     if (err){
                         callback(err);
@@ -184,6 +194,68 @@ function updatePassword(uniqueField, uniqueFieldValue, user, passwordToUpdate, c
 
 
 
+//this method send mail to the admin - using gmail and smtp
+async function contactUs(userEmail, userMessage, callback){
+    const oauth2Client = new OAuth2(
+        "418873488613-p3kggi0tha020oaa553dnh6795majbv2.apps.googleusercontent.com",//client id
+        "XqCxM0WLxEWrtgwT4RCERr9l", // Client Secret
+        "https://developers.google.com/oauthplayground" // Redirect URL
+    );
+    
+    oauth2Client.setCredentials({
+        refresh_token: "1/V-9YETaDGad5Dkb1yL7K6jKxBZ4UMCPUhVduUr6A_Vn-oR2S7S28xPvUk5KBfDWW"
+    });
+    const tokens = await oauth2Client.refreshAccessToken();
+    const accessToken = tokens.credentials.access_token;
+
+    //setting up the transport setting
+    const smtpTransport = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+             type: "OAuth2",
+             user: userEmail, 
+             clientId: "418873488613-p3kggi0tha020oaa553dnh6795majbv2.apps.googleusercontent.com",
+             clientSecret: "XqCxM0WLxEWrtgwT4RCERr9l",
+             refreshToken: "1/V-9YETaDGad5Dkb1yL7K6jKxBZ4UMCPUhVduUr6A_Vn-oR2S7S28xPvUk5KBfDWW",
+             accessToken: accessToken
+        }
+   });
+
+    
+    //Mail options
+    const mailOptions = {
+        from: userEmail,
+        to: adminMail,
+        subject: "moveo skill final project - contact us feature",
+        text: userMessage
+    }
+    
+    //send the mail 
+    smtpTransport.sendMail(mailOptions, (err, response) => {
+        if(err) {
+            callback(err);
+        } else {
+            callback(null, response);
+        }
+        smtpTransport.close();
+   });
+ }
+
+ function termsOfUse(callback){
+    loadPdfToJson();
+ }
+
+ function loadPdfToJson(){
+    let pdfParser = new PDFParser();
+ 
+    pdfParser.on("pdfParser_dataError", errData => console.error(errData.parserError) );
+    pdfParser.on("pdfParser_dataReady", pdfData => {
+        fs.writeFile("/Users/navotslavin/Desktop/moveo/MoveoSkillBackendProject/txtFiles/termsOfUser.json", JSON.stringify(pdfData));
+    });
+ 
+    pdfParser.loadPDF("/Users/navotslavin/Desktop/moveo/MoveoSkillBackendProject/txtFiles/termsOfUser.pdf");
+ }
+
 ///--------------------helper methods--------------------///
 //TODO check if to delete this method
 function updateUser(user, update){
@@ -256,5 +328,7 @@ module.exports = {
     addOrder,
     findByIdAndUpdateUser,
     deleteMealById,
-    updatePassword
+    updatePassword,
+    contactUs,
+    termsOfUse
 };

@@ -73,11 +73,15 @@ router.route('/users/signup')
 router.route('/users/login')
     .post(userController.authenticate, userController.signUser);
 
+router.route('/users/contactUs')
+    .post(authValidator.extractToken, authValidator.verifyToken, userController.contactUs);
+ 
+router.route('/users/termsOfUse')
+    .get(authValidator.extractToken, authValidator.verifyToken, userController.termsOfUse);
+
 //user contact details
 router.route('/users/:id')
     .get(authValidator.extractToken, authValidator.verifyToken, userController.getUserDetailsById);
-
-
 //admins operations
 router.route('/admin/signup')
     .post(adminValidator.validateCreateAdmin,adminController.addAdmin, adminController.signAdmin);
@@ -89,6 +93,7 @@ router.route('/admin/login')
 //protected routes - only admin operation
 router.route('/admin/orders')
     .get(authValidator.extractToken, authValidator.verifyAdminToken, adminController.getOrdersOfUserByUserId);
+
   
 router.route('/admin')
     .post(authValidator.extractToken, authValidator.verifyAdminToken, adminController.addObjectFilter)
