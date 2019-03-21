@@ -19,13 +19,18 @@ router.route('/login')
     .post(adminController.authenticate, adminController.signAdmin);
 
 
-//protected routes - only admin operation
+
+
+router.use(authValidator.extractToken, authValidator.verifyAdminToken);
+//------------------------------------- validating token -------------------------------------//
+//------------------------------------- from here all the request are token valid  -------------------------------------//
+
+router.route('/')
+    .post(adminController.addObjectFilter)
+    .get(adminController.getObjectFilter);
+
 router.route('/orders')
-    .get(authValidator.extractToken, authValidator.verifyAdminToken, adminController.getOrdersOfUserByUserId);
+    .get(adminController.getOrdersOfUserByUserId);
 
   
-router.route('/')
-    .post(authValidator.extractToken, authValidator.verifyAdminToken, adminController.addObjectFilter)
-    .get(authValidator.extractToken, authValidator.verifyAdminToken, adminController.getObjectFilter);
-
-    module.exports = router;
+module.exports = router;

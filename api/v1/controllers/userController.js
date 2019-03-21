@@ -43,11 +43,12 @@ function addMeal(req, res, next){
 //this method add order to the db
 //this method expect to get the exact order to add to the db
 function addOrder(req, res, next){
-    if(req.body.order !== undefined){
-        if(req.body.order.shopping_bag.length === 0){
+    var order = res.locals['order'];
+    if(order !== undefined){
+        if(order.shopping_bag.length === 0){
             next(new Error("couldn't make the order. shopping bag is empty"));
         } else {
-            userHandler.addOrder(req.body.order, function(err, order){
+            userHandler.addOrder(order, function(err, order){
                 if(err){
                     next(err);
                 } else{
@@ -72,6 +73,17 @@ function getUsers(req, res, next){
     });
 }
 
+function findUserById(req, res, next){
+    var projectObject = {shopping_bag:1, total_price:1, _id:1};
+    userHandler.findUserById(req.params.id, projectObject, function(err, user){
+        if(err){
+            next(err);
+        } else{
+            res.locals['order'] = user;
+            next();
+        }
+    });
+}
 //find user by id 
 function getUserDetailsById(req, res, next){
     var projectObject = {email:0, shopping_bag:0};
@@ -137,15 +149,24 @@ function getUserShoppingBag(req, res, next){
             next(err);
         } else{
             const userShoppingBag = userToJson(userShoppingBagDoc);
+            //if we want only the size of the shopping bag
             if(getBoolean(req.query.quantity) === true){
                 var sizeOfShoppingBag = {
                     size : userShoppingBag.shopping_bag.length
                 }
                 res.send(sizeOfShoppingBag);
             } else {
+                //adding the total price to the shopping bag
                 const totalPrice = userHandler.sumShoppingBag(userShoppingBag.shopping_bag);
                 userShoppingBag['total_price'] = totalPrice;
-                res.send(userShoppingBag);
+                //if we want to add order
+                if(getBoolean(req.query.order) === true){
+                    res.locals['order'] = userShoppingBag;
+                    next();
+                } else{
+                    res.send(userShoppingBag);
+                }
+                
             }            
         }
     });
@@ -245,6 +266,7 @@ function termsOfUse(req, res, next){
     })
 }
 
+
 ////----------helper methods-------------/////
 //TODO move to userUtil
 function getBoolean(value){
@@ -282,5 +304,6 @@ module.exports = {
     resetUserShoppingBag,
     updatePassword,
     contactUs,
-    termsOfUse
+    termsOfUse,
+    findUserById
 };

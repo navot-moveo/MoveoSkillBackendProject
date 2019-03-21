@@ -4,29 +4,20 @@ var moment = require('moment');
 var Restaurant = require('../../../db/models/restaurantModel.js');
 var restaurantUtil = require('../../../utils/restaurantUtil.js');
 var DishCatagory = require('../../../db/models/dishCatagoryModel.js');
+var async = require('async');
+var _ = require('underscore');
+
 
 //this method add restaurant to the db
 function addRestaurant(restaurant, callback){
     var newRestaurant = new Restaurant(restaurantToJson(restaurant));
-    newRestaurant.save(function(err, restaurant){
-        if (err){
-            callback(err);
-        } else {
-            callback(null, restaurant);
-        }
-    });
+    newRestaurant.save(callback);
 }
 //this method get all the restaurant from the db
 function getAllRestaurants(callback){
     Restaurant.find({},'name chef imagesUrl')
     .populate('chef', 'name')
-    .exec(function(err, restaurants){
-        if(err){
-            callback(err);
-        } else{
-            callback(null, restaurants);
-        }
-    })   
+    .exec(callback)   
 }
 
 //now this method decided that new restaurant is 14 days from today
@@ -36,13 +27,7 @@ function getNewRestaurants(callback){
     var startDateForNewRestaurant = moment().subtract(periodDefineNewRestaurant, 'days').valueOf();
     Restaurant.find( {"openingDate": {"$gte": startDateForNewRestaurant}} ,'name chef openingDate imagesUrl')
     .populate('chef', 'name')
-    .exec(function(err, restaurants){
-        if(err){
-            callback(err);
-        } else{
-            callback(null, restaurants);
-        }
-    })
+    .exec(callback);
 }
 
 //now this method is limit to the most 5 popular and rating 7 and upper
@@ -55,13 +40,7 @@ function getPopularRestaurants(callback){
         }
     })
     .populate('chef', 'name')
-    .exec(function(err, restaurants){
-        if(err){
-            callback(err);
-        } else{
-            callback(null, restaurants);
-        }
-    }) 
+    .exec(callback); 
 }
 
 //returns all the restaurant that open now
@@ -74,13 +53,7 @@ function getOpenRestaurants(callback) {
         [`openingHours.${dayOfToday}.close`]: { "$gte" : parseInt(hourOfToday)} 
     } 
     Restaurant.find(query ,`name chef openingHours.${dayOfToday}`).populate('chef', 'name')
-    .exec(function(err, restaurants){
-        if(err){
-            callback(err);
-        } else{
-            callback(null, restaurants);
-        }
-    })
+    .exec(callback);
 }
 
 //returns all the restaurant from a specific cuisine
@@ -89,13 +62,7 @@ function getAllSpecificCuisineRestaurants(typeOfCuisine, callback){
     query["cuisine.name"] = typeOfCuisine
     Restaurant.find(query,'name chef cuisine imagesUrl')
     .populate('chef', 'name')
-    .exec(function(err, restaurants){
-        if(err){
-            callback(err);
-        } else{
-            callback(null, restaurants);
-        }
-    });
+    .exec(callback);
 }
 
 //this method gives all the restaurant of a specific chef by id
@@ -119,14 +86,18 @@ function getAllRestaurantsSortedBy(sortField, param, callback){
         getOpenRestaurants(callback);
         break;
         case 'cuisine':
-        if(param == 'allRestaurants'){
-            getAllRestaurants(callback);
-        } else{
+        if(param !== undefined){
             getAllSpecificCuisineRestaurants(param, callback);
-        }    
+        }  else {
+            getAllRestaurants(callback);
+        }
         break;
         case 'chef':
-        getAllSpecificChefRestaurants(param, callback);
+        if(param !== undefined){
+            getAllSpecificChefRestaurants(param, callback);
+        } else {
+            getAllRestaurants(callback);
+        }
         break;
         default:
         getAllRestaurants(callback);
@@ -170,13 +141,7 @@ function getRestaurantProfileById(restaurantId, callback){
 function getRestaurantInfoById(restaurantId, callback){
     var query = {};
     query['_id'] = restaurantId;
-    Restaurant.findOne(query,'openingHours about', function(err, restaurant){
-        if(err){
-            callback(err);
-        } else{
-            callback(null, restaurant);
-        }
-    })
+    Restaurant.findOne(query,'openingHours about', callback);
 }
 
 //this method returns all the info about a restaurant
@@ -193,14 +158,9 @@ function getRestaurantById(restaurantId, callback){
             path:'catagory'
         }]
     })
-    .exec(function(err, restaurant){
-        if(err){
-            callback(err);
-        } else{
-            callback(null, restaurant);
-        }
-    });
+    .exec(callback);
 }
+
 //this method select the action to do on a specific restaurant
 function getRestaurantActionById(id, action, param, callback){
     switch(action){
@@ -220,10 +180,18 @@ function getRestaurantActionById(id, action, param, callback){
         getRestaurantDishes(id, callback);
         break;
         case 'edit':
-        addRestaurantDishes(id, param, callback);
+        if(param !== undefined){
+            addRestaurantDishes(id, param, callback);
+        } else{
+            getRestaurantById(id, callback); 
+        }
         break;
         case 'dishCatagory':
-        getRestaurantSpecificCatagoryDishes(id, param, callback);
+        if(param !== undefined){
+            getRestaurantSpecificCatagoryDishes(id, param, callback);
+        } else{
+            getRestaurantById(id, callback); 
+        } 
         break;
         default:
         getRestaurantById(id, callback);
@@ -272,13 +240,7 @@ function addRestaurantDishes(restaurantId, dishId, callback){
 function getRestaurantMenu(restaurantId, callback){
     var query = {};
     query['restaurant_id'] = restaurantId;
-    DishCatagory.find(query, 'name',function(err, menu){
-        if(err){
-            callback(err);
-        } else{
-            callback(null, menu);
-        }
-    })
+    DishCatagory.find(query, 'name',callback);
 }
 
 //this method returns all the dishes of a restaurand by id  sorted by catagory name
@@ -334,17 +296,22 @@ function getAllRestaurantsCuisine(callback){
     });
 }
 
+function searchRestaurant(q, callback){
+    //TODO: build array in generic way
+    var arrayOfSearchFields = ['cuisine','name','chef'];
+    searchHelperRestaurant(q, arrayOfSearchFields, callback)
+}
+
 
 
 //this method is searching by restaurant, chef, cuisine
-function searchRestaurant(q, searchField, callback){
+function searchHelperRestaurant(q, arrayOfSearchFields, callback){
     //this regex is support partial search of each word in the field
     var regex = new RegExp('^' + q +'| ' + q);
-    const query = {};
-    //convert the search field to the correct json field in the model
-    searchField = convertSearchFieldToJsonField(searchField)
+    var arrayOfQueries = [];
     //updatind the query field
-    query[`${searchField}`] = {$regex: regex, $options:'i'};
+    arrayOfQueries = buildSearchQuery(arrayOfSearchFields, regex);
+    
     Restaurant.aggregate([
         {
             "$lookup": {
@@ -359,16 +326,9 @@ function searchRestaurant(q, searchField, callback){
                 }
         },
         {$unwind: '$chef'},
-        { $match: query },
+        { $match: { $or: arrayOfQueries } },
         { $project : { _id: 0 , imagesUrl : 1, name:1, chef:1, cuisine:1 }}
-    ],
-        function(err, restaurants){
-            if(err){
-                callback(err);
-            } else{
-                callback(null, restaurants)
-            }
-        })
+    ], callback);
 }
 
 ///---------------helper methods------------///
@@ -480,6 +440,19 @@ function dishesToObjectIds(dishesArray){
         dishesArray[index] = new mongoose.Types.ObjectId(dishesArray[index]);     
     }
     return dishesArray;
+}
+
+//this method helps to build all the queries of the search by fields feature
+function buildSearchQuery(arrayOfSearchFields, regex){
+    var arroyOfQueries = [];
+    for(var i = 0; i < arrayOfSearchFields.length; i++){
+        //convert the search field to the correct json field in the model
+        var searchField = convertSearchFieldToJsonField(arrayOfSearchFields[i]);
+        var query = {};
+        query[`${searchField}`] = {$regex: regex, $options:'i'};
+        arroyOfQueries.push(query);
+    }
+    return  arroyOfQueries;
 }
 
 module.exports = {

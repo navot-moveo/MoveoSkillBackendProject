@@ -4,13 +4,7 @@ var Dish = require('../../../db/models/dishModel.js');
 
 function addDish(dish, callback){
     var newDish = new Dish(dishToJson(dish));
-    newDish.save(function(err, dish){
-        if (err){
-            callback(err);
-        } else {
-            callback(null, dish);
-        }
-    });
+    newDish.save(callback);
 }
 //this method gives information before ordering a specific dish 
 function getDishById(dishId, callback){
@@ -20,15 +14,10 @@ function getDishById(dishId, callback){
     .populate({
         path: 'icons'
     })
-    .exec(function(err, dish){
-        if(err){
-            callback(err);
-        } else{
-            callback(null, dish);
-        }
-    });
+    .exec(callback);
 }
 
+//------------------------ helper methods --------------------------//
 function dishToJson(dish){
     var jsonDish = 
     {

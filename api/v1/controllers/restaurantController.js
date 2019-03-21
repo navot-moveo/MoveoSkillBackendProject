@@ -20,11 +20,15 @@ function addRestaurant(req, res, next){
 }
 
 function getRestaurantsSortedBy(req, res, next){
-    restaurantHandler.getAllRestaurantsSortedBy(req.query.sortField, req.query.param, function(err, restaurant){
+    restaurantHandler.getAllRestaurantsSortedBy(req.query.sortField, req.query.param, function(err, restaurants){
         if(err){
             next(err);
         } else{
-            res.send(restaurant);
+            if(restaurants.length === 0){
+                res.send("we didnt found any " + req.query.sortField + " reastaurants.");
+            } else{
+                res.send(restaurants);
+            } 
         }
     });
 }
@@ -66,7 +70,7 @@ function getAllRestaurantsCuisine(req,res,next){
 
 function searchRestaurant(req,res,next){
     var query = req.query.q;
-    restaurantHandler.searchRestaurant(query, req.query.searchField, function(err, restaurant){
+    restaurantHandler.searchRestaurant(query, function(err, restaurant){
         if(err){
             next(err);
         } else{

@@ -15,25 +15,13 @@ var termsOfUsePathFile = '/Users/navotslavin/Desktop/moveo/MoveoSkillBackendProj
 //this method add user 
 function addUser(user, callback){
     var newUser = new User(userToJson(user));
-    newUser.save(function(err, user){
-        if (err){
-            callback(err);
-        } else {
-            callback(null, user);
-        }
-    });
+    newUser.save(callback);
 }
 
 //this method add order 
 function addOrder(order, callback){
     var newOrder = new Order(orderToJson(order));
-    newOrder.save(function(err, order){
-        if (err){
-            callback(err);
-        } else {
-            callback(null, order);
-        }
-    });
+    newOrder.save(callback);
 }
 
 //this method validate that the price of the meal equal to the dish price and add the meal to the db
@@ -65,12 +53,7 @@ function addMeal(meal, callback){
 function deleteMealById(mealObjectId, callback){
     var query = {};
     //query['_id'] = mealObjectId;
-    Meal.findByIdAndRemove(mealObjectId, function(err, deletedMeal){
-        if(err) callback(err);
-        else{
-            callback(null, deletedMeal);
-        }
-    })
+    Meal.findByIdAndRemove(mealObjectId, callback);
 }
 
 //this method find user by unique field and populate shopping bag
@@ -92,7 +75,7 @@ function findUserByUniqueField(uniqueField, valueOfField, projectObject, callbac
                 callback(new Error("couldn't find user by unique field"));
             }
         }
-    })
+    });
 }
 
 //this method find user by id and populate shopping bag
@@ -108,7 +91,7 @@ function findUserById(userId, projectObject, callback){
             } else{
                 callback(new Error("couldn't find user by id"));
             }
-           
+            
         }
     });
 }
@@ -180,14 +163,7 @@ function updatePassword(uniqueField, uniqueFieldValue, user, passwordToUpdate, c
     query[`${uniqueField}`] = uniqueFieldValue;
     user.hashPassword(passwordToUpdate, function(err, hash){
         updatedPassword['password'] = hash;
-        User.findOneAndUpdate(query, updatedPassword, {new:true}, function(err, user){
-            if(err) {
-                callback(err);
-            }
-            else{
-                callback(null, user);
-            }
-        })
+        User.findOneAndUpdate(query, updatedPassword, {new:true}, callback);
     })
 }
 
@@ -241,12 +217,7 @@ async function contactUs(userEmail, userMessage, callback){
  }
 
  function termsOfUse(callback){
-    fs.readFile(termsOfUsePathFile, 'utf8', function(err, data){
-        if(err) callback(err);
-        else{
-            callback(data);
-        }
-    })
+    fs.readFile(termsOfUsePathFile, 'utf8', callback);
  }
 
 ///--------------------helper methods--------------------///
