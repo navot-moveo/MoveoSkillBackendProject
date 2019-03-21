@@ -236,7 +236,7 @@ function contactUs(req, res, next){
 }
 
 function termsOfUse(req, res, next){
-    userHandler.termsOfUse(function(err, termsOfUser){
+    userHandler.termsOfUse(function(err, termsOfUse){
         if(err){
             next(err);
         } else {

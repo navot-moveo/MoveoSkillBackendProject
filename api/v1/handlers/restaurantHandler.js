@@ -103,13 +103,7 @@ function getAllSpecificChefRestaurants(chefId, callback){
     Restaurant.aggregate([
         { $match: { chef: mongoose.Types.ObjectId(chefId) } },
         { $project : { _id: 0 , imagesUrl : 1, name:1 }} 
-    ], function (err, restaurants) {
-        if (err) {
-            callback(err);
-        } else{
-            callback(null, restaurants);
-        }        
-    });
+    ], callback);
 }
 
 //this method decide how to sort the restaurants 

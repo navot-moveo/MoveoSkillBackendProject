@@ -8,9 +8,8 @@ const adminMail = "navot@moveo.co.il";
 const nodemailer = require("nodemailer");
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
-var fs = require('fs'),
-    PDFParser = require("pdf2json");
-
+var fs = require('fs');
+var termsOfUsePathFile = '/Users/navotslavin/Desktop/moveo/MoveoSkillBackendProject/txtFiles/termsOfUse.txt';
 
 
 //this method add user 
@@ -242,18 +241,12 @@ async function contactUs(userEmail, userMessage, callback){
  }
 
  function termsOfUse(callback){
-    loadPdfToJson();
- }
-
- function loadPdfToJson(){
-    let pdfParser = new PDFParser();
- 
-    pdfParser.on("pdfParser_dataError", errData => console.error(errData.parserError) );
-    pdfParser.on("pdfParser_dataReady", pdfData => {
-        fs.writeFile("/Users/navotslavin/Desktop/moveo/MoveoSkillBackendProject/txtFiles/termsOfUser.json", JSON.stringify(pdfData));
-    });
- 
-    pdfParser.loadPDF("/Users/navotslavin/Desktop/moveo/MoveoSkillBackendProject/txtFiles/termsOfUser.pdf");
+    fs.readFile(termsOfUsePathFile, 'utf8', function(err, data){
+        if(err) callback(err);
+        else{
+            callback(data);
+        }
+    })
  }
 
 ///--------------------helper methods--------------------///
