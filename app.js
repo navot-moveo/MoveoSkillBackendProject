@@ -13,6 +13,7 @@ var apiRoutes = require('./api/v1/routes/apiRoutes');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+var port = process.env.port || 3000;
 var app = express();
 
 // view engine setup
@@ -26,6 +27,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+
+app.listen(port, function(){
+  console.log("server is listening....");
+});
+
 
 //todo change the routes here to my routes
 //app.use('/', indexRouter);
@@ -47,4 +55,8 @@ app.use(function(err, req, res, next) {
   }
 });
 
+
+app.get('/', (req, res) => {
+  res.send("Moveo skill final project, HEY!")
+});
 module.exports = app;

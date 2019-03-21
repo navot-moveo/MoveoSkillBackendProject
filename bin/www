@@ -15,11 +15,10 @@ var http = require('http');
 //var port = normalizePort(process.env.PORT || '3000');
 //app.set('port', port);
 
-var port = process.env.port || 3000;
 
 /**
  * Create HTTP server.
- */
+ 
 app.get('/', (req, res) => {
   res.send("Moveo skill final project, HEY!")
 });
@@ -27,7 +26,11 @@ app.get('/', (req, res) => {
 app.listen(port, function(){
   console.log("server is listening....");
 });
+
  //var server = http.createServer(app);
+*/
+
+
 
 /**
  * Listen on provided port, on all network interfaces.
