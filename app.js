@@ -10,9 +10,6 @@ var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
 var apiRoutes = require('./api/v1/routes/apiRoutes');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-
 var port = process.env.port || 3000;
 var app = express();
 
@@ -28,7 +25,9 @@ app.use(expressValidator());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
+app.get('/', (req, res) => {
+  res.send("Moveo skill final project, server is listening on port "+ port +".....")
+});
 
 app.listen(port, function(){
   console.log("server is listening....");
@@ -56,7 +55,5 @@ app.use(function(err, req, res, next) {
 });
 
 
-app.get('/', (req, res) => {
-  res.send("Moveo skill final project, server is listening.....")
-});
+
 module.exports = app;
