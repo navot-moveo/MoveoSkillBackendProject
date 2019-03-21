@@ -1,7 +1,7 @@
 module.exports = {
   apps : [{
     name: 'API',
-    script: 'app.js',
+    script: './bin/www',
 
     // Options reference: https://pm2.io/doc/en/runtime/reference/ecosystem-file/
     args: 'one two',
@@ -19,12 +19,13 @@ module.exports = {
 
   deploy : {
     production : {
-      user : 'node',
-      host : '212.83.163.1',
+      key:'/Users/navotslavin/Desktop/moveo/first-key-pair-aws.pem',
+      user : 'ubuntu',
+      host : 'ec2-34-245-143-131.eu-west-1.compute.amazonaws.com',
       ref  : 'origin/master',
-      repo : 'git@github.com:repo.git',
-      path : '/var/www/production',
-      'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production'
+      repo : 'git@github.com:navot-moveo/MoveoSkillBackendProject.git',
+      path : '/home/ubuntu/app',
+      'post-deploy' : 'npm install && pm2 startOrRestart ecosystem.config.js'
     }
   }
 };
