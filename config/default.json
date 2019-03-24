@@ -4,8 +4,8 @@
         "Configurations":
         {
             "host": "localhost",
-            "user" : "",
-            "password": "",
+            "user" : "navot",
+            "password": "pato",
             "port": "27017",
             "database": "foodDB"
         }
