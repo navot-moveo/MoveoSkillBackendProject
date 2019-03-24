@@ -27,8 +27,9 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, function(){
-  console.log("server is listening....");
+  console.log("server is listening...." + port);
 });
+
 
 
 //todo change the routes here to my routes

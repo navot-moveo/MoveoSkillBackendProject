@@ -2,7 +2,7 @@
   "name": "moveoskillbackendproject",
   "version": "0.0.0",
   "private": true,
-  "main":"index.js"
+  "main":"app.js"
   ,
   "dependencies": {
     "async": "^2.6.2",
