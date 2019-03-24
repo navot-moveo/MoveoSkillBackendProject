@@ -3,7 +3,7 @@
     {
         "Configurations":
         {
-            "host": "localhost",
+            "host": "34.253.183.22",
             "user" : "navot",
             "password": "pato",
             "port": "27017",

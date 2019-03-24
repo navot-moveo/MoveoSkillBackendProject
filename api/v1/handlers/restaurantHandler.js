@@ -42,17 +42,19 @@ function getPopularRestaurants(callback){
 }
 
 //returns all the restaurant that open now
+
 function getOpenRestaurants(callback) {
     // TODO : how to create a nested query using find
    var dayOfToday = convertNumToDay(moment().day());
    var hourOfToday = moment().hour();
     const query = { 
         [`openingHours.${dayOfToday}.open`]: { "$lte" : parseInt(hourOfToday) }, 
-        [`openingHours.${dayOfToday}.close`]: { "$gte" : parseInt(hourOfToday)} 
+        [`openingHours.${dayOfToday}.close`]: { "$gte" : parseInt(hourOfToday) } 
     } 
     Restaurant.find(query ,`name chef openingHours.${dayOfToday}`).populate('chef', 'name')
     .exec(callback);
 }
+
 
 //returns all the restaurant from a specific cuisine
 function getAllSpecificCuisineRestaurants(typeOfCuisine, callback){
