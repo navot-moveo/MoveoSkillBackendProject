@@ -1,10 +1,9 @@
 'use strict';
 
-var createError = require('http-errors');
+
 var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+
+
 var mongo = require('./db/mongooseinit');
 var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
@@ -19,8 +18,6 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator());
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
   res.send("Moveo skill final project, server is listening on port " + port + ".....")
@@ -31,10 +28,6 @@ app.listen(port, function(){
 });
 
 
-
-//todo change the routes here to my routes
-//app.use('/', indexRouter);
-//app.use('/users', usersRouter);
 app.use('/api/',apiRoutes);
 
 // catch 404 and forward to error handler
