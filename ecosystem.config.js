@@ -19,7 +19,7 @@ module.exports = {
 
   deploy : {
     production : {
-      user : 'node',
+      user : 'ubuntu',
       host : '34.244.23.98',
       key:'/Users/navotslavin/Desktop/moveo/first-key-pair-aws.pem',
       ref  : 'origin/master',
