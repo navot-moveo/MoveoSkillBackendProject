@@ -19,14 +19,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator());
 
-app.get('/', (req, res) => {
-  res.send("Moveo skill final project, server is listening on port " + port + ".....")
-});
-
-app.listen(port, function(){
-  console.log("server is listening....");
-});
-
 
 app.use('/api/',apiRoutes);
 
