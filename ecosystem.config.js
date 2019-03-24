@@ -1,7 +1,7 @@
 module.exports = {
   apps : [{
     name: 'Moveo',
-    script: "./bin/www",
+    script: "node ./bin/www",
 
     // Options reference: https://pm2.io/doc/en/runtime/reference/ecosystem-file/
     args: 'one two',
