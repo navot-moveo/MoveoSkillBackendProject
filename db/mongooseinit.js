@@ -16,7 +16,10 @@ if (typeof password === 'undefined' || password.length <= 0) {
 }
 
 //connecting to db
-mongoose.connect('mongodb://' + user + password + dbConfig.host + ':' + dbConfig.port + '/' + dbConfig.database, { useNewUrlParser: true });
+// example: mongoose.connect('mongodb://username:password@host:port/database')
+mongoose.connect('mongodb://navot:pato@ec2-34-253-183-22.eu-west-1.compute.amazonaws.com:27017/foodDB');
+//generic way to connect
+//mongoose.connect('mongodb://' + user + password + dbConfig.host + ':' + dbConfig.port + '/' + dbConfig.database, { useNewUrlParser: true });
 
 var db = mongoose.connection;
 

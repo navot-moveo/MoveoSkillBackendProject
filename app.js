@@ -13,12 +13,9 @@ var apiRoutes = require('./api/v1/routes/apiRoutes');
 var port = process.env.port || 3000;
 var app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 
-app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator());
@@ -26,7 +23,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-  res.send("Moveo skill final project, server is listening on port "+ port +".....")
+  res.send("Moveo skill final project, server is listening on port " + port + ".....")
 });
 
 app.listen(port, function(){

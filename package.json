@@ -2,9 +2,8 @@
   "name": "moveoskillbackendproject",
   "version": "0.0.0",
   "private": true,
-  "scripts": {
-    "start": "node ./app.js"
-  },
+  "main":"app.js"
+  ,
   "dependencies": {
     "async": "^2.6.2",
     "bcrypt": "^3.0.4",
