@@ -1,7 +1,7 @@
 module.exports = {
   apps : [{
-    name: 'Moveo App',
-    script: 'app.js',
+    name: 'Moveo',
+    script: './app.js',
 
     // Options reference: https://pm2.io/doc/en/runtime/reference/ecosystem-file/
     args: 'one two',
@@ -25,7 +25,7 @@ module.exports = {
       ref  : 'origin/master',
       repo : 'git@github.com:navot-moveo/MoveoSkillBackendProject.git',
       path : '/home/ubuntu/Moveo',
-      'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production'
+      'post-deploy' : 'npm install && pm2 startOrRestart ecosystem.config.js'
     }
   }
 };

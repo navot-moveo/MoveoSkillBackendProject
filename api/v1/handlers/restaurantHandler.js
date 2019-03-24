@@ -4,8 +4,6 @@ var moment = require('moment');
 var Restaurant = require('../../../db/models/restaurantModel.js');
 var restaurantUtil = require('../../../utils/restaurantUtil.js');
 var DishCatagory = require('../../../db/models/dishCatagoryModel.js');
-var async = require('async');
-var _ = require('underscore');
 
 
 //this method add restaurant to the db
