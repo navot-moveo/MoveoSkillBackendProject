@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
   res.send("Moveo skill final project, server is listening on port " + port + ".....")
 });
 
-app.listen(3000, function(){
+app.listen(port, function(){
   console.log("server is listening....");
 });
 
