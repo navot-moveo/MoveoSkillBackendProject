@@ -24,7 +24,7 @@ module.exports = {
       key:'/Users/navotslavin/Desktop/moveo/first-key-pair-aws.pem',
       ref  : 'origin/master',
       repo : 'git@github.com:navot-moveo/MoveoSkillBackendProject.git',
-      path : '/home/ubuntu/moveo',
+      path : '/home/ubuntu/Moveo',
       'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production'
     }
   }
