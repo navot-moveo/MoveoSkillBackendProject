@@ -8,6 +8,7 @@ const authUtil = require('../../../utils/authUtil.js');
 const uniquField = 'email';
 var Meal = require('../../../db/models/mealModel.js');
 
+
 //this method add user to the db
 function addUser(req, res, next){
     if(req.body.user !== undefined){
@@ -23,6 +24,7 @@ function addUser(req, res, next){
         next(new Error("user field is undefined"));
     }
 }
+
 
 //this method add meal to the meals collection
 function addMeal(req, res, next){
@@ -62,6 +64,7 @@ function addOrder(req, res, next){
     }
 }
 
+
 //this method get all users in the db
 function getUsers(req, res, next){
     userHandler.getUsers(function(err, users){
@@ -72,6 +75,7 @@ function getUsers(req, res, next){
         }
     });
 }
+
 
 function findUserById(req, res, next){
     var projectObject = {shopping_bag:1, total_price:1, _id:1};
@@ -84,6 +88,7 @@ function findUserById(req, res, next){
         }
     });
 }
+
 //find user by id 
 function getUserDetailsById(req, res, next){
     var projectObject = {email:0, shopping_bag:0};
@@ -241,6 +246,7 @@ function updatePassword(req, res, next){
         })
     }
 }
+
 
 //this method contact with admin
 function contactUs(req, res, next){

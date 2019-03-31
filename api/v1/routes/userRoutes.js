@@ -33,8 +33,6 @@ router.route('/shoppingBag')
     .get(userController.getUserShoppingBag)
     .post(mealValidator.validateCreateMeal, userController.addMeal, userController.updateShoppingBag);
 
-
-
 router.route('/password')
     .post(userController.authenticate, userController.updatePassword);
 
