@@ -29,7 +29,7 @@
     "nodemailer": "^5.1.1",
     "pdf2json": "^1.1.8",
     "underscore": "^1.9.1",
-    "validator": "^10.11.0",
+    "validator": "^13.7.0",
     "xoauth2": "^1.2.0"
   }
 }
